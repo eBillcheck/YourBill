@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electricity Billing Dashboard</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --primary: #333;
+            --accent: #007bff;
+            --pos: #28a745;
+            --neg: #dc3545;
+            --border: #dee2e6;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 20px; line-height: 1.5; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid var(--primary); padding-bottom: 10px; }
+        h1 { margin: 0; font-size: 2.5rem; letter-spacing: -1px; }
+        h2 { background: var(--primary); color: white; padding: 10px 15px; font-size: 1.1rem; border-radius: 5px 5px 0 0; margin: 30px 0 0 0; display: flex; justify-content: space-between; }
+        
+        table { width: 100%; border-collapse: collapse; background: var(--card-bg); margin-bottom: 10px; border: 1px solid var(--border); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+        th { background: #eee; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; position: sticky; top: 0; }
+        
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background-color: #f1f4f9; }
+        
+        .val-bold { font-weight: 700; color: #000; }
+        .status-pos { color: var(--pos); font-weight: 600; }
+        .status-neg { color: var(--neg); font-weight: 600; }
+        .mark-check { color: var(--pos); margin-left: 5px; }
+        
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            th, td { padding: 8px; font-size: 0.85rem; }
+            h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>ELECTRICITY BILLS</h1>
+        <small>Tracking Records: 2024 - 2025</small>
+    </header>
+
+    <h2>September <span>19/10/2024</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>497 → 612</td><td>115x10</td><td>₹1150</td><td class="status-neg">+₹350</td><td class="val-bold">₹1500 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Monu Kushwaha</td><td>337 → 376</td><td>39x10</td><td>₹390</td><td class="status-neg">+₹1890</td><td class="val-bold">₹2280</td></tr>
+            <tr><td>Hiramani Kushwaha</td><td>208 → 259</td><td>51x10</td><td>₹510</td><td class="status-neg">+₹0</td><td class="val-bold">₹510 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Gaurav/Aman</td><td>1778 → 1818</td><td>40x10</td><td>₹400</td><td class="status-neg">+₹280</td><td class="val-bold">₹680 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Rajesh Kushwaha</td><td>667 → 667</td><td>0x10</td><td>₹0</td><td class="status-neg">+₹0</td><td class="val-bold">₹0 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>October <span>16/11/2024</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>612 → 676</td><td>64x10</td><td>₹640</td><td class="status-neg">+₹0</td><td class="val-bold">₹640</td></tr>
+            <tr><td>Monu Kushwaha</td><td>376 → 398</td><td>22x10</td><td>₹220</td><td class="status-neg">+₹2280</td><td class="val-bold">₹2500 [2300✓]</td></tr>
+            <tr><td>Hiramani Kushwaha</td><td>259 → 275</td><td>16x10</td><td>₹160</td><td class="status-neg">+₹0</td><td class="val-bold">₹160 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Gaurav/Aman</td><td>1818 → 1827</td><td>9x10</td><td>₹90</td><td class="status-neg">+₹0</td><td class="val-bold">₹90</td></tr>
+            <tr><td>Suman Patel</td><td>3590 → 3615</td><td>25x10</td><td>₹250</td><td class="status-neg">+₹0</td><td class="val-bold">₹250</td></tr>
+            <tr><td>Shivam Tiwari</td><td>1509 → 1510</td><td>1x10</td><td>₹10</td><td class="status-neg">+₹0</td><td class="val-bold">₹10</td></tr>
+        </tbody>
+    </table>
+
+    <h2>November <span>16/12/2024</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>676 → 721</td><td>45x10</td><td>₹450</td><td class="status-neg">+₹640</td><td class="val-bold">₹1090</td></tr>
+            <tr><td>Monu Kushwaha</td><td>398 → 403</td><td>5x10</td><td>₹50</td><td class="status-neg">+₹200</td><td class="val-bold">₹250</td></tr>
+            <tr><td>Hiramani Kushwaha</td><td>275 → 284</td><td>9x10</td><td>₹90</td><td class="status-neg">+₹0</td><td class="val-bold">₹90 [100✓]</td></tr>
+            <tr><td>Gaurav/Aman</td><td>1827 → 1831</td><td>4x10</td><td>₹40</td><td class="status-neg">+₹90</td><td class="val-bold">₹130</td></tr>
+            <tr><td>Shivam Tiwari</td><td>1510 → 1512</td><td>2x10</td><td>₹20</td><td class="status-neg">+₹10</td><td class="val-bold">₹30</td></tr>
+        </tbody>
+    </table>
+
+    <h2>December <span>15/01/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>721 → 770</td><td>49x10</td><td>₹490</td><td class="status-neg">+₹1090</td><td class="val-bold">₹1580 [1500✓]</td></tr>
+            <tr><td>Monu Kushwaha</td><td>403 → 405</td><td>2x10</td><td>₹20</td><td class="status-neg">+₹250</td><td class="val-bold">₹270 [100✓]</td></tr>
+            <tr><td>Hiramani Kushwaha</td><td>284 → 297</td><td>13x10</td><td>₹130</td><td class="status-pos">-₹10</td><td class="val-bold">₹120</td></tr>
+            <tr><td>Gaurav Kushwaha</td><td>1831 → 1833</td><td>2x10</td><td>₹20</td><td class="status-neg">+₹130</td><td class="val-bold">₹150 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Shivam Tiwari</td><td>1512 → 1512</td><td>0x10</td><td>₹0</td><td class="status-neg">+₹30</td><td class="val-bold">₹30</td></tr>
+            <tr><td>Suman Patel</td><td>3618 → 3620</td><td>2x10</td><td>₹20</td><td class="status-neg">+₹0</td><td class="val-bold">₹20 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>January <span>16/02/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>770 → 820</td><td>50x10</td><td>₹500</td><td class="status-neg">+₹80</td><td class="val-bold">₹580 [500✓]</td></tr>
+            <tr><td>Monu Kushwaha</td><td>405 → 407</td><td>2x10</td><td>₹20</td><td class="status-neg">+₹170</td><td class="val-bold">₹190✓ [310Ad]</td></tr>
+            <tr><td>Hiramani Kushwaha</td><td>297 → 303</td><td>6x10</td><td>₹60</td><td class="status-neg">+₹120</td><td class="val-bold">₹180✓ [10Ad]</td></tr>
+            <tr><td>Gaurav Kushwaha</td><td>1833 → 1836</td><td>3x10</td><td>₹30</td><td class="status-neg">+₹0</td><td class="val-bold">₹30</td></tr>
+            <tr><td>Shivam Tiwari</td><td>1512 → 1513</td><td>1x10</td><td>₹10</td><td class="status-neg">+₹30</td><td class="val-bold">₹40</td></tr>
+            <tr><td>Suman Patel</td><td>3620 → 3621</td><td>1x10</td><td>₹10</td><td class="status-neg">+₹0</td><td class="val-bold">₹10 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>February <span>16/03/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>820 → 856</td><td>36x10</td><td>₹360</td><td class="status-neg">+₹80</td><td class="val-bold">₹440 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Monu Kushwaha</td><td>407 → 423</td><td>16x10</td><td>₹160</td><td class="status-pos">-₹160</td><td class="val-bold">₹160✓ [150Ad]</td></tr>
+            <tr><td>Hiramani Kushwaha</td><td>303 → 308</td><td>5x10</td><td>₹50</td><td class="status-pos">-₹10</td><td class="val-bold">₹40 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Gaurav Kushwaha</td><td>1836 → 1843</td><td>7x10</td><td>₹70</td><td class="status-neg">+₹30</td><td class="val-bold">₹100 [50✓]</td></tr>
+            <tr><td>Suman Patel</td><td>3621 → 3627</td><td>6x10</td><td>₹60</td><td class="status-neg">+₹0</td><td class="val-bold">₹60</td></tr>
+            <tr><td>Golu Kushwaha</td><td>1246 → 1254</td><td>8x10</td><td>₹80</td><td class="status-neg">+₹0</td><td class="val-bold">₹80 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>March <span>17/04/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>856 → 925</td><td>69x10</td><td>₹690</td><td class="status-pos">+₹0</td><td class="val-bold">₹690✓ [10Adv]</td></tr>
+            <tr><td>Monu Kushwaha</td><td>423 → 449</td><td>26x10</td><td>₹260</td><td class="status-pos">-₹150</td><td class="val-bold">₹110</td></tr>
+            <tr><td>Hiramani Kushwaha</td><td>308 → 323</td><td>15x10</td><td>₹150</td><td class="status-pos">+₹0</td><td class="val-bold">₹150 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Gaurav Kushwaha</td><td>1843 → 1871</td><td>28x10</td><td>₹280</td><td class="status-neg">+₹50</td><td class="val-bold">₹330</td></tr>
+            <tr><td>Suman Patel</td><td>3627 → 3645</td><td>18x10</td><td>₹180</td><td class="status-neg">+₹60</td><td class="val-bold">₹240 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Shyam Lal Patel</td><td>1255 → 1299</td><td>44x10</td><td>₹440</td><td class="status-pos">+₹0</td><td class="val-bold">₹440 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>April <span>14/05/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>925 → 1027</td><td>102x10</td><td>₹1020</td><td class="status-pos">−₹10</td><td class="val-bold">₹1010 [1000✓]</td></tr>
+            <tr><td>Monu Kushwaha</td><td>449 → 483</td><td>34x10</td><td>₹340</td><td class="status-neg">+₹110</td><td class="val-bold">₹450 [100✓]</td></tr>
+            <tr><td>Hiramani Kushwaha</td><td>323 → 361</td><td>38x10</td><td>₹380</td><td class="status-pos">+₹0</td><td class="val-bold">₹380 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Gaurav/Arman</td><td>1871 → 1891</td><td>20x10</td><td>₹200</td><td class="status-neg">+₹330</td><td class="val-bold">₹530 [240✓]</td></tr>
+            <tr><td>Suman Patel</td><td>3645 → 3664</td><td>19x10</td><td>₹190</td><td class="status-pos">+₹0</td><td class="val-bold">₹190 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Shyam Lal Patel</td><td>1299 → 1354</td><td>55x10</td><td>₹550</td><td class="status-pos">+₹0</td><td class="val-bold">₹550 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Rekha Upadhyay</td><td>719 → 747</td><td>28x10</td><td>₹280</td><td class="status-pos">+₹0</td><td class="val-bold">₹280 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>May <span>12/06/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>1027 → 1160</td><td>133x10</td><td>₹1330</td><td class="status-neg">+₹10</td><td class="val-bold">₹1340 [1300✓]</td></tr>
+            <tr><td>Monu Kushwaha</td><td>483 → 540</td><td>57x10</td><td>₹570</td><td class="status-neg">+₹350</td><td class="val-bold">₹920 [500✓]</td></tr>
+            <tr><td>Gaurav Kushwaha</td><td>1891 → 1924</td><td>33x10</td><td>₹330</td><td class="status-neg">+₹290</td><td class="val-bold">₹620✓ [45Ad]</td></tr>
+            <tr><td>Shyam Lal Patel</td><td>1354 → 1411</td><td>57x10+150</td><td>₹720</td><td class="status-pos">+₹0</td><td class="val-bold">₹720 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Suman Patel</td><td>3664 → 3665</td><td>1x10</td><td>₹10</td><td class="status-pos">+₹0</td><td class="val-bold">₹10 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>June <span>14/07/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>1160 → 1326</td><td>166x10</td><td>₹1660</td><td class="status-neg">+₹40</td><td class="val-bold">₹1700 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Monu Kushwaha</td><td>540 → 583</td><td>43x10</td><td>₹430</td><td class="status-neg">+₹420</td><td class="val-bold">₹850 [500✓]</td></tr>
+            <tr><td>Gaurav/Aman</td><td>1924 → 1952</td><td>28x10</td><td>₹280</td><td class="status-pos">-₹45</td><td class="val-bold">₹235✓ [₹5-Ad]</td></tr>
+            <tr><td>Shyam Lal Patel</td><td>380 → 458</td><td>78x10</td><td>₹780</td><td class="status-pos">+₹0</td><td class="val-bold">₹780 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>July <span>07/08/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>1326 → 1436</td><td>110x10</td><td>₹1100</td><td class="status-pos">+₹0</td><td class="val-bold">₹1100 [1000✓]</td></tr>
+            <tr><td>Monu Kushwaha</td><td>583 → 608</td><td>25x10</td><td>₹250</td><td class="status-neg">+₹350</td><td class="val-bold">₹600</td></tr>
+            <tr><td>Gaurav/Aman</td><td>1952 → 1995</td><td>43x10</td><td>₹430</td><td class="status-pos">-₹5</td><td class="val-bold">₹425</td></tr>
+            <tr><td>Shyam Lal Patel</td><td>458 → 505</td><td>47x10</td><td>₹470</td><td class="status-pos">+₹0</td><td class="val-bold">₹470✓ [30ad]</td></tr>
+            <tr><td>Priyanka Sondiya</td><td>1447 → 1477</td><td>30x10</td><td>₹300</td><td class="status-pos">+₹60</td><td class="val-bold">₹360</td></tr>
+            <tr><td>Manisha Diwedi</td><td>8 → 47</td><td>39x10</td><td>₹390</td><td class="status-pos">+₹0</td><td class="val-bold">₹390 [200✓]</td></tr>
+            <tr><td>Mukesh Kushwaha</td><td>1527 → 1552</td><td>25x10</td><td>₹250</td><td class="status-pos">+₹0</td><td class="val-bold">₹250 <span class="mark-check">✓</span></td></tr>
+        </tbody>
+    </table>
+
+    <h2>August <span>10/09/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>1436 → 1583</td><td>147x10</td><td>₹1470</td><td class="status-neg">+₹100</td><td class="val-bold">₹1570</td></tr>
+            <tr><td>Monu Kushwaha</td><td>608 → 648</td><td>40x10</td><td>₹400</td><td class="status-pos">+₹0</td><td class="val-bold">₹400</td></tr>
+            <tr><td>Gaurav/Aman</td><td>1995 → 2018</td><td>23x10</td><td>₹230</td><td class="status-pos">+₹0</td><td class="val-bold">₹230</td></tr>
+            <tr><td>Shyam Lal Patel</td><td>505 → 565</td><td>60x10</td><td>₹600</td><td class="status-pos">-₹30</td><td class="val-bold">₹570</td></tr>
+            <tr><td>Priyanka Sondiya</td><td>1477 → 1505</td><td>28x10</td><td>₹280</td><td class="status-neg">+₹60</td><td class="val-bold">₹340</td></tr>
+            <tr><td>Manisha Diwedi</td><td>61 → 103</td><td>42x10</td><td>₹420</td><td class="status-pos">+₹0</td><td class="val-bold">₹420</td></tr>
+            <tr><td>Mukesh Kushwaha</td><td>1552 → 1587</td><td>35x10</td><td>₹350</td><td class="status-pos">+₹0</td><td class="val-bold">₹350</td></tr>
+        </tbody>
+    </table>
+
+    <h2>September <span>07/10/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>1583 → 1701</td><td>118x10</td><td>₹1180</td><td class="status-neg">+₹70</td><td class="val-bold">₹1250</td></tr>
+            <tr><td>Monu Kushwaha</td><td>648 → 699</td><td>51x10</td><td>₹510</td><td class="status-neg">+₹200</td><td class="val-bold">₹710</td></tr>
+            <tr><td>Gaurav/Aman</td><td>2018 → 2053</td><td>35x10</td><td>₹350</td><td class="status-neg">+₹230</td><td class="val-bold">₹580</td></tr>
+            <tr><td>Shyam Lal Patel</td><td>565 → 622</td><td>57x10</td><td>₹570</td><td class="status-neg">+₹70</td><td class="val-bold">₹640</td></tr>
+            <tr><td>Manisha Diwedi</td><td>103 → 156</td><td>53x10</td><td>₹530</td><td class="status-neg">+₹20</td><td class="val-bold">₹550</td></tr>
+            <tr><td>Mukesh Kushwaha</td><td>1587 → 1625</td><td>38x10</td><td>₹380</td><td class="status-neg">+₹350</td><td class="val-bold">₹730</td></tr>
+            <tr><td>Harish Patel</td><td>1044 → 1093</td><td>49x10</td><td>₹490</td><td class="status-pos">+₹0</td><td class="val-bold">₹490</td></tr>
+        </tbody>
+    </table>
+
+    <h2>October <span>07/11/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>1701 → 1775</td><td>74x10</td><td>₹740</td><td class="status-neg">+₹150</td><td class="val-bold">₹890 [800✓]</td></tr>
+            <tr><td>Monu Kushwaha</td><td>699 → 733</td><td>34x10</td><td>₹340</td><td class="status-neg">+₹310</td><td class="val-bold">₹650 [500✓]</td></tr>
+            <tr><td>Gaurav/Aman</td><td>2053 → 2077</td><td>24x10</td><td>₹240</td><td class="status-pos">+₹0</td><td class="val-bold">₹240 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Shyam Lal Patel</td><td>622 → 675</td><td>53x10</td><td>₹530</td><td class="status-pos">+₹0</td><td class="val-bold">₹530 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Manisha Diwedi</td><td>156 → 201</td><td>45x10</td><td>₹450</td><td class="status-pos">+₹0</td><td class="val-bold">₹450 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Mukesh Kushwaha</td><td>1625 → 1656</td><td>31x10</td><td>₹310</td><td class="status-neg">+₹10</td><td class="val-bold">₹320 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Harish Patel</td><td>1093 → 1115</td><td>22x10</td><td>₹220</td><td class="status-pos">-₹10</td><td class="val-bold">₹210 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Anshul Singh</td><td>1506 → 1578</td><td>72x10</td><td>₹720</td><td class="status-pos">+₹0</td><td class="val-bold">₹720✓ [80adv]</td></tr>
+        </tbody>
+    </table>
+
+    <h2>November <span>07/12/2025</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>1775 → 1822</td><td>47x10</td><td>₹470</td><td class="status-neg">+₹90</td><td class="val-bold">₹560</td></tr>
+            <tr><td>Monu Kushwaha</td><td>733 → 735</td><td>2x10</td><td>₹20</td><td class="status-neg">+₹150</td><td class="val-bold">₹170</td></tr>
+            <tr><td>Gaurav/Aman</td><td>2077 → 2082</td><td>5x10</td><td>₹50</td><td class="status-pos">+₹0</td><td class="val-bold">₹50</td></tr>
+            <tr><td>Shyam Lal Patel</td><td>675 → 701</td><td>26x10</td><td>₹260</td><td class="status-pos">+₹0</td><td class="val-bold">₹260</td></tr>
+            <tr><td>Manisha Diwedi</td><td>201 → 206</td><td>5x10</td><td>₹50</td><td class="status-pos">+₹0</td><td class="val-bold">₹50</td></tr>
+            <tr><td>Mukesh Kushwaha</td><td>1656 → 1667</td><td>11x10</td><td>₹110</td><td class="status-pos">+₹0</td><td class="val-bold">₹110</td></tr>
+            <tr><td>Harish Patel</td><td>1115 → 1120</td><td>5x10</td><td>₹50</td><td class="status-pos">+₹0</td><td class="val-bold">₹50 <span class="mark-check">✓</span></td></tr>
+            <tr><td>Anshul Singh</td><td>1578 → 1582</td><td>4x10</td><td>₹40</td><td class="status-pos">+₹0</td><td class="val-bold">₹40✓ [40adv]</td></tr>
+        </tbody>
+    </table>
+
+    <h2>December <span>05/01/2026</span></h2>
+    <table>
+        <thead><tr><th>Consumer</th><th>Units</th><th>Rate</th><th>Bill</th><th>Old</th><th>Total</th></tr></thead>
+        <tbody>
+            <tr><td>Khuman Kushwaha</td><td>1822 → 1869</td><td>47x10</td><td>₹470</td><td class="status-neg">+₹60</td><td class="val-bold">₹530</td></tr>
+            <tr><td>Monu Kushwaha</td><td>735 → 738</td><td>3x10</td><td>₹30</td><td class="status-neg">+₹10</td><td class="val-bold">₹40</td></tr>
+            <tr><td>Shyam Lal Patel</td><td>701 → 708</td><td>7x10</td><td>₹70</td><td class="status-neg">+₹60</td><td class="val-bold">₹130</td></tr>
+            <tr><td>Gaurav/Aman</td><td>2082 → 2086</td><td>4x10</td><td>₹40</td><td class="status-pos">+₹0</td><td class="val-bold">₹40</td></tr>
+            <tr><td>Mukesh Kushwaha</td><td>1667 → 1670</td><td>5x10</td><td>₹50</td><td class="status-pos">+₹0</td><td class="val-bold">₹50</td></tr>
+            <tr><td>Manisha Diwedi</td><td>206 → 208</td><td>2x10</td><td>₹20</td><td class="status-pos">+₹0</td><td class="val-bold">₹20</td></tr>
+            <tr><td>Harish Patel</td><td>1120 → 1125</td><td>5x10</td><td>₹50</td><td class="status-pos">+₹0</td><td class="val-bold">₹50</td></tr>
+            <tr><td>Anshul Singh</td><td>1582 → 1589</td><td>7x10</td><td>₹70</td><td class="status-pos">-₹40</td><td class="val-bold">₹30</td></tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
