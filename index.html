@@ -3,68 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electricity Billing - Smart System 2026</title>
+    <title>Electricity Billing - Cloud System 2026</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Segoe+UI:wght@400;600;700&display=swap');
-
-        :root {
-            --bg-color: #f4f7f6;
-            --container-bg: #ffffff;
-            --text-header: #2c3e50;
-            --accent: #3498db;
-        }
-
-        [data-theme="dark"] {
-            --bg-color: #1a1a1a;
-            --container-bg: #2d2d2d;
-            --text-header: #ffffff;
-        }
-
+        :root { --bg-color: #f4f7f6; --container-bg: #ffffff; --text-header: #2c3e50; --accent: #3498db; }
+        [data-theme="dark"] { --bg-color: #1a1a1a; --container-bg: #2d2d2d; --text-header: #ffffff; }
         body { background-color: var(--bg-color); font-family: 'Segoe UI', sans-serif; transition: 0.3s; margin: 0; color: var(--text-header); padding: 20px; }
-
         .header-3d { text-align: center; font-family: 'Montserrat', sans-serif; font-size: clamp(30px, 8vw, 60px); font-weight: 900; text-transform: uppercase; animation: float 4s infinite; margin-bottom: 20px; }
         @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
-
-        .nav-container { max-width: 1200px; margin: 0 auto 20px auto; display: flex; justify-content: flex-end; gap: 10px; }
+        .nav-container { max-width: 1200px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; align-items: center; }
         .btn-blue { background: #3498db; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: 700; border: none; cursor: pointer; transition: 0.2s; }
-        .btn-blue:hover { opacity: 0.8; }
-
         #adminPanel { display: none; }
         .admin-panel { max-width: 1200px; margin: 0 auto 30px auto; background: var(--container-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
         .admin-panel input, .admin-panel select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: var(--bg-color); color: inherit; }
-
-        .bill-container { max-width: 1200px; margin: 0 auto 40px auto; background: var(--container-bg); padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .bill-container { max-width: 1200px; margin: 0 auto 40px auto; background: var(--container-bg); padding: 25px; border-radius: 166px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .month-title { color: var(--accent); border-left: 5px solid var(--accent); padding-left: 15px; font-family: 'Montserrat', sans-serif; margin: 0; }
-
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
         thead tr { background: #2c3e50; color: white; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; font-size: 13px; }
-
         .status-pill { padding: 6px 12px; border-radius: 6px; font-size: 10px; font-weight: 800; display: inline-block; }
         .status-paid { background: #d4edda; color: #155724; }
         .status-unpaid { background: #f8d7da; color: #721c24; }
         .status-partial { background: #fff3cd; color: #856404; }
-
         .pay-received { color: #27ae60; font-weight: bold; display: block; }
         .pay-rem { color: #e67e22; font-size: 11px; font-weight: bold; }
-        .pay-adv { color: #3498db; font-size: 11px; font-weight: bold; }
-
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 10000; }
         .modal-box { background: white; padding: 30px; border-radius: 12px; width: 320px; text-align: center; color: #333; }
         .modal-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-
         .edit-btn { background: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         .del-btn { background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
         .footer-link { text-align: center; margin-top: 30px; font-size: 13px; opacity: 0.6; cursor: pointer; text-decoration: underline; }
         .theme-toggle { position: fixed; bottom: 20px; right: 20px; padding: 15px; border-radius: 50%; cursor: pointer; background: var(--accent); color: white; border: none; z-index: 1001; }
     </style>
 </head>
-<body onload="setupYearMonth(); displayAllTables(); updateNameSuggestions();">
+<body onload="setupYearMonth()">
 
     <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
     <h1 class="header-3d">Billing Dashboard</h1>
 
     <div class="nav-container">
+        <span id="syncIcon" style="color: #27ae60; font-size: 12px;">● Cloud Live</span>
         <a href="Pre.html" class="btn-blue">↺ Previous Records</a>
     </div>
 
@@ -72,18 +54,12 @@
         <div class="admin-panel">
             <select id="inputMonth"></select>
             <input type="date" id="inputDate">
-            
             <input type="text" id="name" placeholder="Name" list="nameList" oninput="autoFillDetails(this.value)">
             <datalist id="nameList"></datalist>
-
             <input type="number" id="oldR" placeholder="Old Reading">
             <input type="number" id="newR" placeholder="New Reading">
             <input type="number" id="balanceCarry" placeholder="Balance Carry (+/-)">
-            <button onclick="addRow()" class="btn-blue" style="background:#27ae60;">Add Entry</button>
-            
-            <button onclick="exportData()" class="btn-blue" style="background:#8e44ad;">📥 Export Backup</button>
-            <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-            <button onclick="document.getElementById('importFile').click()" class="btn-blue" style="background:#2c3e50;">📤 Import Backup</button>
+            <button onclick="addRow()" class="btn-blue" style="background:#27ae60;">Add to Cloud</button>
         </div>
     </div>
 
@@ -106,213 +82,144 @@
             <h3>Update Payments</h3>
             <p id="editInfo" style="font-size:12px; color:#666;"></p>
             <input type="hidden" id="editId">
-            <label style="font-size:12px; display:block; text-align:left;">Received Amount:</label>
-            <input type="number" id="editPaid">
-            <label style="font-size:12px; display:block; text-align:left;">Balance Carry (+/-):</label>
-            <input type="number" id="editBalance">
+            <input type="number" id="editPaid" placeholder="Received Amount">
+            <input type="number" id="editBalance" placeholder="Balance Carry">
             <button onclick="saveEdit()" class="btn-blue" style="width:100%; background:#27ae60;">Save & Update</button>
             <button onclick="closeModal('editModal')" style="background:none; border:none; color:red; margin-top:10px; cursor:pointer;">Cancel</button>
         </div>
     </div>
 
     <script>
+        // --- YOUR FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCoEyQf22lNxJLGPttZxjMiiu4OGQhXsZk",
+            authDomain: "myelectricitybill-49244.firebaseapp.com",
+            databaseURL: "https://myelectricitybill-49244-default-rtdb.firebaseio.com",
+            projectId: "myelectricitybill-49244",
+            storageBucket: "myelectricitybill-49244.firebasestorage.app",
+            messagingSenderId: "343702698525",
+            appId: "1:343702698525:web:2c46f3b5597bde55b4a4f4"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
         let isAdmin = false;
+        let globalData = [];
+
+        // --- REALTIME LISTENER ---
+        db.ref('billingData').on('value', (snapshot) => {
+            const data = snapshot.val();
+            globalData = data ? Object.values(data) : [];
+            displayAllTables(globalData);
+            updateNameSuggestions(globalData);
+        });
 
         function setupYearMonth() {
             const select = document.getElementById('inputMonth');
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const years = [2026, 2027, 2028, 2029];
-            years.forEach(year => months.forEach(month => {
+            [2026, 2027, 2028].forEach(y => months.forEach(m => {
                 let opt = document.createElement('option');
-                opt.value = `${month} ${year}`;
-                opt.innerHTML = `${month} ${year}`;
+                opt.value = `${m} ${y}`; opt.innerHTML = `${m} ${y}`;
                 select.appendChild(opt);
             }));
         }
 
-        // --- NEW AUTO-FILL LOGIC ---
-        function updateNameSuggestions() {
-            const data = JSON.parse(localStorage.getItem('multiMonthData')) || [];
-            const nameList = document.getElementById('nameList');
-            const uniqueNames = [...new Set(data.map(item => item.name))];
-            nameList.innerHTML = '';
-            uniqueNames.forEach(name => {
-                let opt = document.createElement('option');
-                opt.value = name;
-                nameList.appendChild(opt);
+        function displayAllTables(data) {
+            const container = document.getElementById('tablesContainer');
+            container.innerHTML = '';
+            if(!data.length) { container.innerHTML = '<p style="text-align:center; opacity:0.5;">No Cloud Records.</p>'; return; }
+
+            const monthsOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const uniqueMonths = [...new Set(data.map(i => i.month))].sort((a,b) => {
+                const [m1, y1] = a.split(" "), [m2, y2] = b.split(" ");
+                return y1 - y2 || monthsOrder.indexOf(m1) - monthsOrder.indexOf(m2);
+            });
+
+            uniqueMonths.forEach(month => {
+                const monthData = data.filter(i => i.month === month);
+                let html = `<div class="bill-container"><h2 class="month-title">${month}</h2><div style="overflow-x:auto; margin-top:15px;"><table><thead><tr><th>Name</th><th>Reading</th><th>Units</th><th>Cost(₹10)</th><th>Prev. Bal</th><th>Total</th><th>Status</th>${isAdmin?'<th>Action</th>':''}</tr></thead><tbody>`;
+                
+                monthData.forEach(item => {
+                    const units = item.newR - item.oldR;
+                    const totalBill = (units * 10) + item.bal;
+                    html += `<tr>
+                        <td><b>${item.name}</b></td>
+                        <td>${item.oldR}→${item.newR}</td>
+                        <td>${units}</td>
+                        <td style="color:#2980b9; font-weight:bold">₹${units*10}</td>
+                        <td style="color:${item.bal>=0?'red':'green'}">${item.bal}</td>
+                        <td style="background:#f9f9f9; font-weight:bold">₹${totalBill}</td>
+                        <td><span class="status-pill ${item.status==='PAID'?'status-paid':(item.status==='PARTIAL'?'status-partial':'status-unpaid')}">${item.status}</span></td>
+                        ${isAdmin ? `<td><button class="edit-btn" onclick="openEdit(${item.id})">Edit</button> <button class="del-btn" onclick="deleteRow(${item.id})">Del</button></td>` : ''}
+                    </tr>`;
+                });
+                container.innerHTML += html + `</tbody></table></div></div>`;
             });
         }
 
+        function addRow() {
+            if(!isAdmin) return;
+            const entry = {
+                id: Date.now(),
+                month: document.getElementById('inputMonth').value,
+                date: document.getElementById('inputDate').value,
+                name: document.getElementById('name').value,
+                oldR: parseInt(document.getElementById('oldR').value) || 0,
+                newR: parseInt(document.getElementById('newR').value) || 0,
+                bal: parseInt(document.getElementById('balanceCarry').value) || 0,
+                paid: 0, status: "NOT PAID"
+            };
+            if(!entry.name || !entry.date) return alert("Fill Name/Date!");
+            db.ref('billingData/' + entry.id).set(entry);
+            document.getElementById('name').value = '';
+            document.getElementById('newR').value = '';
+        }
+
+        function saveEdit() {
+            const id = document.getElementById('editId').value;
+            const paid = parseInt(document.getElementById('editPaid').value) || 0;
+            const bal = parseInt(document.getElementById('editBalance').value) || 0;
+            const item = globalData.find(i => i.id == id);
+            const total = ((item.newR - item.oldR) * 10) + bal;
+            const status = (paid >= total) ? "PAID" : (paid > 0 ? "PARTIAL" : "NOT PAID");
+            db.ref('billingData/' + id).update({ paid, bal, status });
+            closeModal('editModal');
+        }
+
+        function deleteRow(id) { if(confirm("Delete from Cloud?")) db.ref('billingData/' + id).remove(); }
         function autoFillDetails(val) {
-            const data = JSON.parse(localStorage.getItem('multiMonthData')) || [];
-            // Filter records for this name and sort by ID (timestamp) to get the latest
-            const userRecords = data.filter(item => item.name === val).sort((a, b) => b.id - a.id);
-            
-            if (userRecords.length > 0) {
-                const latestRecord = userRecords[0];
-                // Automatically set Old Reading as the last New Reading
-                document.getElementById('oldR').value = latestRecord.newR;
-                
-                // Optional: Calculate balance carry if they hadn't paid fully
-                const lastUnits = latestRecord.newR - latestRecord.oldR;
-                const lastTotal = (lastUnits * 10) + latestRecord.bal;
-                const remaining = lastTotal - latestRecord.paid;
-                document.getElementById('balanceCarry').value = remaining;
+            const userRecords = globalData.filter(item => item.name === val).sort((a,b) => b.id - a.id);
+            if(userRecords.length > 0) {
+                const latest = userRecords[0];
+                document.getElementById('oldR').value = latest.newR;
+                document.getElementById('balanceCarry').value = ((latest.newR - latest.oldR)*10) + latest.bal - latest.paid;
             }
         }
-        // ---------------------------
-
+        function updateNameSuggestions(data) {
+            const list = document.getElementById('nameList');
+            list.innerHTML = '';
+            [...new Set(data.map(i => i.name))].forEach(n => {
+                let o = document.createElement('option'); o.value = n; list.appendChild(o);
+            });
+        }
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-
         function checkLogin() {
             if(document.getElementById('adminId').value === "visibleego" && document.getElementById('adminPass').value === "lockdown2019") {
                 isAdmin = true;
                 document.getElementById('adminPanel').style.display = 'block';
                 document.getElementById('loginBtn').style.display = 'none';
                 closeModal('loginModal');
-                displayAllTables();
-            } else { alert("Invalid Credentials!"); }
+                displayAllTables(globalData);
+            } else { alert("Wrong Password!"); }
         }
-
-        function addRow() {
-            if(!isAdmin) return;
-            const month = document.getElementById('inputMonth').value;
-            const date = document.getElementById('inputDate').value;
-            const name = document.getElementById('name').value;
-            const oldR = parseInt(document.getElementById('oldR').value);
-            const newR = parseInt(document.getElementById('newR').value);
-            const bal = parseInt(document.getElementById('balanceCarry').value) || 0;
-            if(!name || !date || isNaN(oldR) || isNaN(newR)) return alert("Details bharein!");
-
-            const entry = { name, oldR, newR, bal, paid: 0, status: "NOT PAID", month, date, id: Date.now() };
-            const data = JSON.parse(localStorage.getItem('multiMonthData')) || [];
-            data.push(entry);
-            localStorage.setItem('multiMonthData', JSON.stringify(data));
-            
-            // Refresh tables and the name suggestions list
-            displayAllTables();
-            updateNameSuggestions();
-            
-            // Clear inputs for next entry
-            document.getElementById('name').value = '';
-            document.getElementById('oldR').value = '';
-            document.getElementById('newR').value = '';
-            document.getElementById('balanceCarry').value = '';
-        }
-
-        function exportData() {
-            const data = localStorage.getItem('multiMonthData');
-            if (!data || data === "[]") return alert("No data!");
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Electricity_Backup.json`;
-            a.click();
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (Array.isArray(importedData)) {
-                        localStorage.setItem('multiMonthData', JSON.stringify(importedData));
-                        displayAllTables();
-                        updateNameSuggestions();
-                    }
-                } catch (err) { alert("Error!"); }
-            };
-            reader.readAsText(file);
-        }
-
-        function saveEdit() {
-            let id = parseInt(document.getElementById('editId').value);
-            let data = JSON.parse(localStorage.getItem('multiMonthData'));
-            let item = data.find(i => i.id === id);
-            item.paid = parseInt(document.getElementById('editPaid').value) || 0;
-            item.bal = parseInt(document.getElementById('editBalance').value) || 0;
-            let totalBill = ((item.newR - item.oldR) * 10) + item.bal;
-            item.status = (item.paid >= totalBill) ? "PAID" : (item.paid > 0 ? "PARTIAL" : "NOT PAID");
-            localStorage.setItem('multiMonthData', JSON.stringify(data));
-            closeModal('editModal');
-            displayAllTables();
-            updateNameSuggestions();
-        }
-
-        function displayAllTables() {
-            const container = document.getElementById('tablesContainer');
-            const data = JSON.parse(localStorage.getItem('multiMonthData')) || [];
-            container.innerHTML = '';
-            
-            if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center; opacity:0.5;">No records found.</p>';
-                return;
-            }
-
-            const monthsOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            const uniqueMonths = [...new Set(data.map(item => item.month))].sort((a, b) => {
-                const [m1, y1] = a.split(" "); const [m2, y2] = b.split(" ");
-                return y1 - y2 || monthsOrder.indexOf(m1) - monthsOrder.indexOf(m2);
-            });
-
-            uniqueMonths.forEach(month => {
-                const monthData = data.filter(item => item.month === month);
-                let tableHtml = `<div class="bill-container"><div><h2 class="month-title">${month}</h2><span style="font-size:12px; opacity:0.7;">Date: ${monthData[0].date.split("-").reverse().join("/")}</span></div><div style="overflow-x:auto; margin-top:15px;"><table><thead><tr><th>Name</th><th>Reading</th><th>Units</th><th>Current Month (₹)</th><th>Prev. Balance</th><th>Total Payable</th><th>Payment Summary</th><th>Status</th>${isAdmin?'<th>Action</th>':''}</tr></thead><tbody>`;
-                
-                monthData.forEach(item => {
-                    const units = item.newR - item.oldR;
-                    const currentCharge = units * 10;
-                    const totalBill = currentCharge + item.bal;
-                    let diff = totalBill - item.paid;
-                    
-                    let paymentInfo = `<span class="pay-received">Received: ₹${item.paid}</span>`;
-                    if (diff > 0 && item.paid > 0) {
-                        paymentInfo += `<span class="pay-rem">Remaining: ₹${diff}</span>`;
-                    } else if (diff < 0) {
-                        paymentInfo += `<span class="pay-adv">Advance: ₹${Math.abs(diff)}</span>`;
-                    }
-
-                    let balColor = item.bal >= 0 ? "red" : "green";
-                    let balSign = item.bal >= 0 ? "+" : "";
-
-                    tableHtml += `<tr>
-                        <td style="font-weight:bold">${item.name}</td>
-                        <td>${item.oldR}→${item.newR}</td>
-                        <td>${units}</td>
-                        <td style="color:#2980b9; font-weight:bold">₹${currentCharge}</td>
-                        <td style="color:${balColor}; font-weight:bold">${balSign}${item.bal}</td>
-                        <td style="font-weight:bold; background:#f9f9f9;">₹${totalBill}</td>
-                        <td>${paymentInfo}</td>
-                        <td><span class="status-pill ${item.status==='PAID'?'status-paid':(item.status==='PARTIAL'?'status-partial':'status-unpaid')}">${item.status}</span></td>
-                        ${isAdmin ? `<td><button class="edit-btn" onclick="openEdit(${item.id})">Edit</button> <button class="del-btn" onclick="deleteRow(${item.id})">Del</button></td>` : ''}
-                    </tr>`;
-                });
-                container.innerHTML += tableHtml + `</tbody></table></div></div>`;
-            });
-        }
-
-        function deleteRow(id) { if(isAdmin && confirm("Delete?")) { 
-            let data = JSON.parse(localStorage.getItem('multiMonthData'));
-            localStorage.setItem('multiMonthData', JSON.stringify(data.filter(i => i.id !== id)));
-            displayAllTables();
-            updateNameSuggestions();
-        }}
-
         function openEdit(id) {
-            if(!isAdmin) return;
-            let data = JSON.parse(localStorage.getItem('multiMonthData'));
-            let item = data.find(i => i.id === id);
+            const item = globalData.find(i => i.id == id);
             document.getElementById('editId').value = id;
             document.getElementById('editPaid').value = item.paid;
             document.getElementById('editBalance').value = item.bal;
-            document.getElementById('editInfo').innerText = `Editing: ${item.name}`;
             document.getElementById('editModal').style.display = 'flex';
         }
-
         function toggleTheme() { document.body.getAttribute('data-theme')==='dark'?document.body.removeAttribute('data-theme'):document.body.setAttribute('data-theme','dark'); }
     </script>
 </body>
