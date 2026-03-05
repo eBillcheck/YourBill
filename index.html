@@ -21,7 +21,9 @@
         .admin-panel { max-width: 1200px; margin: 0 auto 30px auto; background: var(--container-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
         .admin-panel input, .admin-panel select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: var(--bg-color); color: inherit; }
         .bill-container { max-width: 1200px; margin: 0 auto 40px auto; background: var(--container-bg); padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .month-title { color: var(--accent); border-left: 5px solid var(--accent); padding-left: 15px; font-family: 'Montserrat', sans-serif; margin: 0; }
+        .month-header { display: flex; justify-content: space-between; align-items: flex-end; border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 15px; }
+        .month-title { color: var(--accent); font-family: 'Montserrat', sans-serif; margin: 0; }
+        .bill-date-label { font-size: 14px; font-weight: 600; color: #7f8c8d; }
         table { width: 100%; border-collapse: collapse; min-width: 900px; }
         thead tr { background: #2c3e50; color: white; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: center; font-size: 13px; }
@@ -29,7 +31,6 @@
         .status-paid { background: #d4edda; color: #155724; }
         .status-unpaid { background: #f8d7da; color: #721c24; }
         .status-partial { background: #fff3cd; color: #856404; }
-        .pay-received { color: #27ae60; font-weight: bold; display: block; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 10000; }
         .modal-box { background: white; padding: 30px; border-radius: 12px; width: 320px; text-align: center; color: #333; }
         .modal-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
@@ -58,7 +59,7 @@
             <input type="number" id="oldR" placeholder="Old Reading">
             <input type="number" id="newR" placeholder="New Reading">
             <input type="number" id="balanceCarry" placeholder="Prev. Bal (+/-)">
-            <button onclick="addRow()" class="btn-blue" style="background:#27ae60;">Add to Cloud</button>
+            <button onclick="addRow()" class="btn-blue" style="background:#27ae60;">Add Entry</button>
             <button onclick="exportData()" class="btn-blue" style="background:#8e44ad;">📥 Backup</button>
             <input type="file" id="importFile" style="display:none" onchange="importData(event)">
             <button onclick="document.getElementById('importFile').click()" class="btn-blue" style="background:#2c3e50;">📤 Import Cloud</button>
@@ -127,7 +128,7 @@
         function displayAllTables(data) {
             const container = document.getElementById('tablesContainer');
             container.innerHTML = '';
-            if(!data.length) { container.innerHTML = '<p style="text-align:center; opacity:0.5;">Empty Cloud.</p>'; return; }
+            if(!data.length) { container.innerHTML = '<p style="text-align:center; opacity:0.5;">No Data.</p>'; return; }
 
             const monthsOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const sortedMonths = [...new Set(data.map(i => i.month))].sort((a,b) => {
@@ -137,21 +138,52 @@
 
             sortedMonths.forEach(month => {
                 const monthData = data.filter(i => i.month === month);
-                let html = `<div class="bill-container"><h2 class="month-title">${month}</h2><div style="overflow-x:auto; margin-top:15px;"><table><thead><tr><th>Name</th><th>Reading</th><th>Units</th><th>Cost</th><th>Prev. Bal</th><th>Total</th><th>Status</th>${isAdmin?'<th>Action</th>':''}</tr></thead><tbody>`;
+                // Get date from first entry of the month
+                const rawDate = monthData[0].date || "";
+                const formattedDate = rawDate ? rawDate.split('-').reverse().join('/') : "N/A";
+
+                let html = `<div class="bill-container">
+                    <div class="month-header">
+                        <h2 class="month-title">${month}</h2>
+                        <span class="bill-date-label">Bill Date: ${formattedDate}</span>
+                    </div>
+                    <div style="overflow-x:auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Reading</th>
+                                    <th>Units</th>
+                                    <th>Cost</th>
+                                    <th>Prev. Bal</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    ${isAdmin?'<th>Action</th>':''}
+                                </tr>
+                            </thead>
+                            <tbody>`;
+
                 monthData.forEach(item => {
                     const units = item.newR - item.oldR;
                     const total = (units * 10) + item.bal;
-                    html += `<tr><td><b>${item.name}</b></td><td>${item.oldR}→${item.newR}</td><td>${units}</td><td>₹${units*10}</td><td style="color:${item.bal>=0?'red':'green'}">${item.bal}</td><td style="font-weight:bold">₹${total}</td><td><span class="status-pill ${item.status==='PAID'?'status-paid':(item.status==='PARTIAL'?'status-partial':'status-unpaid')}">${item.status}</span></td>${isAdmin?`<td><button class="edit-btn" onclick="openEdit(${item.id})">Edit</button> <button class="del-btn" onclick="deleteRow(${item.id})">Del</button></td>`:''}</tr>`;
+                    html += `<tr>
+                        <td><b>${item.name}</b></td>
+                        <td>${item.oldR}→${item.newR}</td>
+                        <td>${units}</td>
+                        <td style="color:#2980b9; font-weight:bold;">₹${units*10}</td>
+                        <td style="color:${item.bal>=0?'#e74c3c':'#27ae60'}">${item.bal>=0?'+':''}${item.bal}</td>
+                        <td style="font-weight:bold; background:rgba(0,0,0,0.02);">₹${total}</td>
+                        <td><span class="status-pill ${item.status==='PAID'?'status-paid':(item.status==='PARTIAL'?'status-partial':'status-unpaid')}">${item.status}</span></td>
+                        ${isAdmin?`<td><button class="edit-btn" onclick="openEdit(${item.id})">Edit</button> <button class="del-btn" onclick="deleteRow(${item.id})">Del</button></td>`:''}
+                    </tr>`;
                 });
                 container.innerHTML += html + `</tbody></table></div></div>`;
             });
         }
 
-        // --- ENCODED LOGIN (HIDDEN FROM VIEW SOURCE) ---
         function checkLogin() {
             const u = document.getElementById('adminId').value;
             const p = document.getElementById('adminPass').value;
-            // Encoded: visibleego | lockdown2019
             if(btoa(u) === "dmlzaWJsZWVnbw==" && btoa(p) === "bG9ja2Rvd24yMDE5") {
                 isAdmin = true;
                 document.getElementById('adminPanel').style.display = 'block';
@@ -184,9 +216,9 @@
                     const imported = JSON.parse(e.target.result);
                     if (Array.isArray(imported)) {
                         imported.forEach(item => { db.ref('billingData/' + (item.id || Date.now() + Math.random())).update(item); });
-                        alert("Imported to Cloud!");
+                        alert("Imported!");
                     }
-                } catch (err) { alert("Invalid File!"); }
+                } catch (err) { alert("Error!"); }
             };
             reader.readAsText(file);
         }
@@ -201,7 +233,7 @@
             closeModal('editModal');
         }
 
-        function deleteRow(id) { if(confirm("Delete from Cloud?")) db.ref('billingData/' + id).remove(); }
+        function deleteRow(id) { if(confirm("Delete?")) db.ref('billingData/' + id).remove(); }
 
         function autoFillDetails(val) {
             const records = globalData.filter(i => i.name === val).sort((a,b) => b.id - a.id);
