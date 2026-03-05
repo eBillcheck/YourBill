@@ -7,6 +7,7 @@
     
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Segoe+UI:wght@400;600;700&display=swap');
@@ -20,7 +21,7 @@
         #adminPanel { display: none; }
         .admin-panel { max-width: 1200px; margin: 0 auto 30px auto; background: var(--container-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; }
         .admin-panel input, .admin-panel select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: var(--bg-color); color: inherit; }
-        .bill-container { max-width: 1200px; margin: 0 auto 40px auto; background: var(--container-bg); padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .bill-container { max-width: 1200px; margin: 0 auto 40px auto; background: var(--container-bg); padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); page-break-inside: avoid; }
         .month-header { display: flex; justify-content: space-between; align-items: flex-end; border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 15px; }
         .month-title { color: var(--accent); font-family: 'Montserrat', sans-serif; margin: 0; }
         .bill-date-label { font-size: 14px; font-weight: 600; color: #7f8c8d; }
@@ -34,8 +35,8 @@
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; z-index: 10000; }
         .modal-box { background: white; padding: 30px; border-radius: 12px; width: 320px; text-align: center; color: #333; }
         .modal-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        .edit-btn { background: #f39c12; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-        .del-btn { background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+        .edit-btn, .del-btn { padding: 5px 10px; border-radius: 4px; cursor: pointer; border: none; color: white; }
+        .edit-btn { background: #f39c12; } .del-btn { background: #ff4757; }
         .footer-link { text-align: center; margin-top: 30px; font-size: 13px; opacity: 0.6; cursor: pointer; text-decoration: underline; }
         .theme-toggle { position: fixed; bottom: 20px; right: 20px; padding: 15px; border-radius: 50%; cursor: pointer; background: var(--accent); color: white; border: none; z-index: 1001; }
     </style>
@@ -60,13 +61,16 @@
             <input type="number" id="newR" placeholder="New Reading">
             <input type="number" id="balanceCarry" placeholder="Prev. Bal (+/-)">
             <button onclick="addRow()" class="btn-blue" style="background:#27ae60;">Add Entry</button>
+            <button onclick="downloadPDF()" class="btn-blue" style="background:#e67e22;">📄 Download PDF</button>
             <button onclick="exportData()" class="btn-blue" style="background:#8e44ad;">📥 Backup</button>
             <input type="file" id="importFile" style="display:none" onchange="importData(event)">
-            <button onclick="document.getElementById('importFile').click()" class="btn-blue" style="background:#2c3e50;">📤 Import Cloud</button>
+            <button onclick="document.getElementById('importFile').click()" class="btn-blue" style="background:#2c3e50;">📤 Import</button>
         </div>
     </div>
 
-    <div id="tablesContainer"></div>
+    <div id="pdfContent">
+        <div id="tablesContainer"></div>
+    </div>
 
     <div class="footer-link" id="loginBtn" onclick="openLogin()">🔐 Admin Login</div>
 
@@ -128,17 +132,17 @@
         function displayAllTables(data) {
             const container = document.getElementById('tablesContainer');
             container.innerHTML = '';
-            if(!data.length) { container.innerHTML = '<p style="text-align:center; opacity:0.5;">No Data.</p>'; return; }
+            if(!data.length) { container.innerHTML = '<p style="text-align:center; opacity:0.5;">No Data Found.</p>'; return; }
 
             const monthsOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             const sortedMonths = [...new Set(data.map(i => i.month))].sort((a,b) => {
                 const [m1, y1] = a.split(" "), [m2, y2] = b.split(" ");
-                return y1 - y2 || monthsOrder.indexOf(m1) - monthsOrder.indexOf(m2);
+                if (y2 !== y1) return y2 - y1;
+                return monthsOrder.indexOf(m2) - monthsOrder.indexOf(m1);
             });
 
             sortedMonths.forEach(month => {
                 const monthData = data.filter(i => i.month === month);
-                // Get date from first entry of the month
                 const rawDate = monthData[0].date || "";
                 const formattedDate = rawDate ? rawDate.split('-').reverse().join('/') : "N/A";
 
@@ -151,14 +155,8 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Reading</th>
-                                    <th>Units</th>
-                                    <th>Cost</th>
-                                    <th>Prev. Bal</th>
-                                    <th>Total</th>
-                                    <th>Status</th>
-                                    ${isAdmin?'<th>Action</th>':''}
+                                    <th>Name</th><th>Reading</th><th>Units</th><th>Cost</th><th>Prev. Bal</th><th>Total</th><th>Status</th>
+                                    ${isAdmin ? '<th class="no-print">Action</th>' : ''}
                                 </tr>
                             </thead>
                             <tbody>`;
@@ -174,10 +172,31 @@
                         <td style="color:${item.bal>=0?'#e74c3c':'#27ae60'}">${item.bal>=0?'+':''}${item.bal}</td>
                         <td style="font-weight:bold; background:rgba(0,0,0,0.02);">₹${total}</td>
                         <td><span class="status-pill ${item.status==='PAID'?'status-paid':(item.status==='PARTIAL'?'status-partial':'status-unpaid')}">${item.status}</span></td>
-                        ${isAdmin?`<td><button class="edit-btn" onclick="openEdit(${item.id})">Edit</button> <button class="del-btn" onclick="deleteRow(${item.id})">Del</button></td>`:''}
+                        ${isAdmin ? `<td class="no-print"><button class="edit-btn" onclick="openEdit(${item.id})">Edit</button> <button class="del-btn" onclick="deleteRow(${item.id})">Del</button></td>` : ''}
                     </tr>`;
                 });
                 container.innerHTML += html + `</tbody></table></div></div>`;
+            });
+        }
+
+        // --- NEW PDF FUNCTION ---
+        function downloadPDF() {
+            const element = document.getElementById('pdfContent');
+            const opt = {
+                margin: 10,
+                filename: 'Electricity_Bills_2026.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            
+            // Temporary hide action columns for clean PDF
+            const actionCols = document.querySelectorAll('.no-print');
+            actionCols.forEach(el => el.style.display = 'none');
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore action columns after saving
+                actionCols.forEach(el => el.style.display = '');
             });
         }
 
@@ -190,7 +209,7 @@
                 document.getElementById('loginBtn').style.display = 'none';
                 closeModal('loginModal');
                 displayAllTables(globalData);
-            } else { alert("Access Denied!"); }
+            } else { alert("Wrong Details!"); }
         }
 
         function addRow() {
