@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electricity Billing - Compact System 2026</title>
+    <title>Electricity Billing - Smart System 2026</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Segoe+UI:wght@400;600;700&display=swap');
 
@@ -59,7 +59,7 @@
         .theme-toggle { position: fixed; bottom: 20px; right: 20px; padding: 15px; border-radius: 50%; cursor: pointer; background: var(--accent); color: white; border: none; z-index: 1001; }
     </style>
 </head>
-<body onload="setupYearMonth(); displayAllTables();">
+<body onload="setupYearMonth(); displayAllTables(); updateNameSuggestions();">
 
     <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
     <h1 class="header-3d">Billing Dashboard</h1>
@@ -72,7 +72,10 @@
         <div class="admin-panel">
             <select id="inputMonth"></select>
             <input type="date" id="inputDate">
-            <input type="text" id="name" placeholder="Name">
+            
+            <input type="text" id="name" placeholder="Name" list="nameList" oninput="autoFillDetails(this.value)">
+            <datalist id="nameList"></datalist>
+
             <input type="number" id="oldR" placeholder="Old Reading">
             <input type="number" id="newR" placeholder="New Reading">
             <input type="number" id="balanceCarry" placeholder="Balance Carry (+/-)">
@@ -127,6 +130,38 @@
             }));
         }
 
+        // --- NEW AUTO-FILL LOGIC ---
+        function updateNameSuggestions() {
+            const data = JSON.parse(localStorage.getItem('multiMonthData')) || [];
+            const nameList = document.getElementById('nameList');
+            const uniqueNames = [...new Set(data.map(item => item.name))];
+            nameList.innerHTML = '';
+            uniqueNames.forEach(name => {
+                let opt = document.createElement('option');
+                opt.value = name;
+                nameList.appendChild(opt);
+            });
+        }
+
+        function autoFillDetails(val) {
+            const data = JSON.parse(localStorage.getItem('multiMonthData')) || [];
+            // Filter records for this name and sort by ID (timestamp) to get the latest
+            const userRecords = data.filter(item => item.name === val).sort((a, b) => b.id - a.id);
+            
+            if (userRecords.length > 0) {
+                const latestRecord = userRecords[0];
+                // Automatically set Old Reading as the last New Reading
+                document.getElementById('oldR').value = latestRecord.newR;
+                
+                // Optional: Calculate balance carry if they hadn't paid fully
+                const lastUnits = latestRecord.newR - latestRecord.oldR;
+                const lastTotal = (lastUnits * 10) + latestRecord.bal;
+                const remaining = lastTotal - latestRecord.paid;
+                document.getElementById('balanceCarry').value = remaining;
+            }
+        }
+        // ---------------------------
+
         function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
@@ -154,56 +189,44 @@
             const data = JSON.parse(localStorage.getItem('multiMonthData')) || [];
             data.push(entry);
             localStorage.setItem('multiMonthData', JSON.stringify(data));
+            
+            // Refresh tables and the name suggestions list
             displayAllTables();
+            updateNameSuggestions();
+            
+            // Clear inputs for next entry
+            document.getElementById('name').value = '';
+            document.getElementById('oldR').value = '';
+            document.getElementById('newR').value = '';
+            document.getElementById('balanceCarry').value = '';
         }
 
-        // --- BACKUP LOGIC START ---
         function exportData() {
             const data = localStorage.getItem('multiMonthData');
-            if (!data || data === "[]") return alert("Koyi data nahi hai export ke liye!");
-
+            if (!data || data === "[]") return alert("No data!");
             const blob = new Blob([data], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            const timestamp = new Date().toISOString().split('T')[0];
             a.href = url;
-            a.download = `Electricity_Backup_${timestamp}.json`;
-            document.body.appendChild(a);
+            a.download = `Electricity_Backup.json`;
             a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
         }
 
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const importedData = JSON.parse(e.target.result);
                     if (Array.isArray(importedData)) {
-                        if (confirm("Kya aap data restore karna chahte hain? Isse maujuda data badal jayega.")) {
-                            localStorage.setItem('multiMonthData', JSON.stringify(importedData));
-                            displayAllTables();
-                            alert("Data successfully restore ho gaya!");
-                        }
-                    } else { alert("Invalid Backup File!"); }
-                } catch (err) { alert("File load karne mein error!"); }
+                        localStorage.setItem('multiMonthData', JSON.stringify(importedData));
+                        displayAllTables();
+                        updateNameSuggestions();
+                    }
+                } catch (err) { alert("Error!"); }
             };
             reader.readAsText(file);
-        }
-        // --- BACKUP LOGIC END ---
-
-        function openEdit(id) {
-            if(!isAdmin) return;
-            let data = JSON.parse(localStorage.getItem('multiMonthData'));
-            let item = data.find(i => i.id === id);
-            document.getElementById('editId').value = id;
-            document.getElementById('editPaid').value = item.paid;
-            document.getElementById('editBalance').value = item.bal;
-            document.getElementById('editInfo').innerText = `Editing: ${item.name}`;
-            document.getElementById('editModal').style.display = 'flex';
         }
 
         function saveEdit() {
@@ -217,6 +240,7 @@
             localStorage.setItem('multiMonthData', JSON.stringify(data));
             closeModal('editModal');
             displayAllTables();
+            updateNameSuggestions();
         }
 
         function displayAllTables() {
@@ -225,7 +249,7 @@
             container.innerHTML = '';
             
             if (data.length === 0) {
-                container.innerHTML = '<p style="text-align:center; opacity:0.5;">No records found. Please add or import data.</p>';
+                container.innerHTML = '<p style="text-align:center; opacity:0.5;">No records found.</p>';
                 return;
             }
 
@@ -237,11 +261,12 @@
 
             uniqueMonths.forEach(month => {
                 const monthData = data.filter(item => item.month === month);
-                let tableHtml = `<div class="bill-container"><div class="bill-header"><h2 class="month-title">${month}</h2><span>Date: ${monthData[0].date.split("-").reverse().join("/")}</span></div><div style="overflow-x:auto"><table><thead><tr><th>Name</th><th>Reading</th><th>Units</th><th>Balance Carry</th><th>Total Bill</th><th>Payment Summary</th><th>Status</th>${isAdmin?'<th>Action</th>':''}</tr></thead><tbody>`;
+                let tableHtml = `<div class="bill-container"><div><h2 class="month-title">${month}</h2><span style="font-size:12px; opacity:0.7;">Date: ${monthData[0].date.split("-").reverse().join("/")}</span></div><div style="overflow-x:auto; margin-top:15px;"><table><thead><tr><th>Name</th><th>Reading</th><th>Units</th><th>Current Month (₹)</th><th>Prev. Balance</th><th>Total Payable</th><th>Payment Summary</th><th>Status</th>${isAdmin?'<th>Action</th>':''}</tr></thead><tbody>`;
                 
                 monthData.forEach(item => {
                     const units = item.newR - item.oldR;
-                    const totalBill = (units * 10) + item.bal;
+                    const currentCharge = units * 10;
+                    const totalBill = currentCharge + item.bal;
                     let diff = totalBill - item.paid;
                     
                     let paymentInfo = `<span class="pay-received">Received: ₹${item.paid}</span>`;
@@ -256,9 +281,11 @@
 
                     tableHtml += `<tr>
                         <td style="font-weight:bold">${item.name}</td>
-                        <td>${item.oldR}→${item.newR}</td><td>${units}</td>
+                        <td>${item.oldR}→${item.newR}</td>
+                        <td>${units}</td>
+                        <td style="color:#2980b9; font-weight:bold">₹${currentCharge}</td>
                         <td style="color:${balColor}; font-weight:bold">${balSign}${item.bal}</td>
-                        <td style="font-weight:bold">₹${totalBill}</td>
+                        <td style="font-weight:bold; background:#f9f9f9;">₹${totalBill}</td>
                         <td>${paymentInfo}</td>
                         <td><span class="status-pill ${item.status==='PAID'?'status-paid':(item.status==='PARTIAL'?'status-partial':'status-unpaid')}">${item.status}</span></td>
                         ${isAdmin ? `<td><button class="edit-btn" onclick="openEdit(${item.id})">Edit</button> <button class="del-btn" onclick="deleteRow(${item.id})">Del</button></td>` : ''}
@@ -272,7 +299,20 @@
             let data = JSON.parse(localStorage.getItem('multiMonthData'));
             localStorage.setItem('multiMonthData', JSON.stringify(data.filter(i => i.id !== id)));
             displayAllTables();
+            updateNameSuggestions();
         }}
+
+        function openEdit(id) {
+            if(!isAdmin) return;
+            let data = JSON.parse(localStorage.getItem('multiMonthData'));
+            let item = data.find(i => i.id === id);
+            document.getElementById('editId').value = id;
+            document.getElementById('editPaid').value = item.paid;
+            document.getElementById('editBalance').value = item.bal;
+            document.getElementById('editInfo').innerText = `Editing: ${item.name}`;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
         function toggleTheme() { document.body.getAttribute('data-theme')==='dark'?document.body.removeAttribute('data-theme'):document.body.setAttribute('data-theme','dark'); }
     </script>
 </body>
