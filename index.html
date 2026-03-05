@@ -23,9 +23,9 @@
         .bill-container { max-width: 1200px; margin: 20px auto; background: var(--container-bg); padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .month-header { border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 15px; }
         .month-date-sub { font-size: 12px; color: #7f8c8d; font-weight: bold; margin-top: 2px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; table-layout: fixed; }
         thead tr { background: #2c3e50; color: white; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; font-size: 13px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; font-size: 13px; word-wrap: break-word; }
         .status-pill { padding: 5px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .status-paid { background: #d4edda; color: #155724; }
         .status-unpaid { background: #f8d7da; color: #721c24; }
@@ -33,12 +33,15 @@
         .sub-text { font-size: 11px; display: block; margin-top: 3px; font-weight: 700; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 9999; }
         .modal-box { background: white; padding: 25px; border-radius: 12px; width: 300px; text-align: center; color: #333; }
-        @media print { .no-print { display: none !important; } }
+        
+        /* PDF specific cleaning classes */
+        .no-print { display: block; }
+        .only-print { display: none; }
     </style>
 </head>
 <body onload="setupYearMonth()">
 
-    <h1 class="header-3d">Cloud Billing 2026</h1>
+    <h1 class="header-3d no-print">Cloud Billing 2026</h1>
 
     <div class="nav-container no-print">
         <span id="syncIcon" style="color: #27ae60; font-size: 12px; font-weight: bold;">● Cloud Linked</span>
@@ -65,7 +68,7 @@
         </div>
     </div>
 
-    <div id="pdfContent">
+    <div id="pdfWrapper">
         <div id="tablesContainer"></div>
     </div>
 
@@ -140,8 +143,8 @@
                         <div class="month-date-sub">${tableDate}</div>
                     </div>
                     <div style="overflow-x:auto;"><table><thead><tr>
-                        <th>Name</th><th>Reading</th><th>Units</th><th>Current Bill</th><th>Prev. Bill</th><th>Total Bill</th><th>Received</th><th>Status</th>
-                        ${isAdmin ? '<th class="no-print">Action</th>' : ''}
+                        <th style="width:15%">Name</th><th style="width:15%">Reading</th><th style="width:10%">Units</th><th style="width:12%">Current Bill</th><th style="width:12%">Prev. Bill</th><th style="width:12%">Total Bill</th><th style="width:14%">Received</th><th style="width:10%">Status</th>
+                        ${isAdmin ? '<th class="no-print" style="width:100px;">Action</th>' : ''}
                     </tr></thead><tbody>`;
 
                 monthData.forEach(item => {
@@ -157,7 +160,7 @@
                         <td style="font-weight:bold; background:rgba(0,0,0,0.03);">₹${total}</td>
                         <td><b style="color:#27ae60;">₹${received}</b>${extra}</td>
                         <td><span class="status-pill ${item.status==='PAID'?'status-paid':(item.status==='PARTIAL'?'status-partial':'status-unpaid')}">${item.status}</span></td>
-                        ${isAdmin ? `<td class="no-print"><button onclick="openEdit(${item.id})" style="background:#f39c12; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer;">Edit</button> <button onclick="deleteRow(${item.id})" style="background:#ff4757; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer;">Del</button></td>` : ''}
+                        ${isAdmin ? `<td class="no-print"><button onclick="openEdit(${item.id})" style="background:#f39c12; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:10px;">Edit</button> <button onclick="deleteRow(${item.id})" style="background:#ff4757; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:10px;">Del</button></td>` : ''}
                     </tr>`;
                 });
                 container.innerHTML += html + `</tbody></table></div></div>`;
@@ -165,11 +168,33 @@
         }
 
         function downloadPDF() {
-            const element = document.getElementById('pdfContent');
-            const opt = { margin: 10, filename: 'Bills_Export.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' } };
-            html2pdf().set(opt).from(element).save();
+            // Target the wrapper that holds the tables
+            const element = document.getElementById('pdfWrapper');
+            
+            // Temporary hide everything with 'no-print' class before capturing
+            const noPrintElements = document.querySelectorAll('.no-print');
+            noPrintElements.forEach(el => el.style.display = 'none');
+
+            const opt = {
+                margin: [10, 5, 10, 5],
+                filename: 'Electricity_Bills_2026.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                // Restore visibility for screen viewing after PDF is generated
+                noPrintElements.forEach(el => {
+                    if(el.tagName === 'TH' || el.tagName === 'TD') el.style.display = 'table-cell';
+                    else if(el.id === 'adminPanel' && isAdmin) el.style.display = 'block';
+                    else if(el.className.includes('nav-container')) el.style.display = 'flex';
+                    else el.style.display = 'block';
+                });
+            });
         }
 
+        // Rest of the logic remains the same
         function importData(event) {
             const file = event.target.files[0];
             if (!file) return;
