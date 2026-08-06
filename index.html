@@ -3,64 +3,286 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Electricity Billing - Pro Cloud 2026</title>
+    <title>Electricity Billing</title>
     
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script> <!-- Auth SDK Added -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Segoe+UI:wght@400;600;700&display=swap');
-        :root { --bg-color: #f4f7f6; --container-bg: #ffffff; --text-header: #2c3e50; --accent: #3498db; }
-        [data-theme="dark"] { --bg-color: #1a1a1a; --container-bg: #2d2d2d; --text-header: #ffffff; }
-        body { background-color: var(--bg-color); font-family: 'Segoe UI', sans-serif; transition: 0.3s; margin: 0; color: var(--text-header); padding: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         
-        /* Font Fixed: Original Montserrat look locked globally */
-        .header-3d { text-align: center; font-family: 'Montserrat', sans-serif; font-size: clamp(30px, 8vw, 50px); font-weight: 900; text-transform: uppercase; margin-bottom: 5px; }
+        :root { 
+            --bg-color: #f0f4f8; 
+            --container-bg: #ffffff; 
+            --text-header: #102a43; 
+            --text-body: #334e68;
+            --accent: #0052cc; 
+            --accent-hover: #003e99;
+            --success: #00875a;
+            --danger: #de350b;
+            --warning: #ff991f;
+            --border: #d9e2ec;
+        }
+        [data-theme="dark"] { 
+            --bg-color: #121212; 
+            --container-bg: #1e1e1e; 
+            --text-header: #ffffff; 
+            --text-body: #e0e0e0;
+            --accent: #4c9aff; 
+            --border: #333333;
+        }
         
-        .lang-btn-container { text-align: center; margin-bottom: 25px; }
-        .btn-lang-big { background: #2ecc71; color: white; padding: 12px 35px; border-radius: 30px; font-weight: 700; border: none; cursor: pointer; font-size: 16px; box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3); transition: 0.2s; }
-        .btn-lang-big:hover { transform: scale(1.05); background: #27ae60; }
+        body { 
+            background-color: var(--bg-color); 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s, color 0.3s; 
+            margin: 0; 
+            color: var(--text-body); 
+            padding: 15px 3%; 
+        }
+        
+        .header-3d { 
+            text-align: center; 
+            font-size: clamp(22px, 5vw, 36px); 
+            font-weight: 800; 
+            color: var(--text-header);
+            margin-bottom: 15px; 
+            letter-spacing: -0.5px;
+        }
+        
+        .lang-btn-container { text-align: center; margin-bottom: 20px; }
+        .btn-lang-big { 
+            background: var(--accent); 
+            color: white; 
+            padding: 8px 24px; 
+            border-radius: 50px; 
+            font-weight: 600; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 14px; 
+            box-shadow: 0 4px 10px rgba(0, 82, 204, 0.2); 
+            transition: all 0.2s ease; 
+        }
+        .btn-lang-big:hover { transform: translateY(-2px); box-shadow: 0 6px 14px rgba(0, 82, 204, 0.3); }
 
-        .nav-container { max-width: 1200px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .nav-actions { display: flex; align-items: center; gap: 8px; }
-        .btn-blue { background: #3498db; color: white; padding: 10px 15px; border-radius: 8px; font-weight: 700; border: none; cursor: pointer; font-size: 11px; }
+        .nav-container { 
+            max-width: 1200px; 
+            margin: 0 auto 20px auto; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap; 
+            gap: 10px; 
+            background: var(--container-bg);
+            padding: 8px 15px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            border: 1px solid var(--border);
+        }
+        
+        #syncIcon {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--success);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer; /* Makes it look clickable but subtle */
+            user-select: none;
+        }
+
+        .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        
+        .btn-blue { 
+            background: var(--accent); 
+            color: white; 
+            padding: 7px 14px; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 12px; 
+            transition: opacity 0.2s;
+        }
+        .btn-blue:hover { opacity: 0.9; }
+
         #adminPanel { display: none; }
-        .admin-panel { max-width: 1200px; margin: 0 auto 30px auto; background: var(--container-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-        .admin-panel input, .admin-panel select { padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: var(--bg-color); color: inherit; }
-        .bill-container { max-width: 1200px; margin: 20px auto; background: var(--container-bg); padding: 25px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        .month-header { border-left: 5px solid var(--accent); padding-left: 15px; margin-bottom: 15px; }
-        .month-date-sub { font-size: 12px; color: #7f8c8d; font-weight: bold; margin-top: 2px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; table-layout: fixed; }
-        thead tr { background: #2c3e50; color: white; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; font-size: 13px; word-wrap: break-word; }
-        .status-pill { padding: 5px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .status-paid { background: #d4edda; color: #155724; }
-        .status-unpaid { background: #f8d7da; color: #721c24; }
-        .status-partial { background: #fff3cd; color: #856404; }
-        .sub-text { font-size: 11px; display: block; margin-top: 3px; font-weight: 700; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); align-items: center; justify-content: center; z-index: 9999; }
-        .modal-box { background: white; padding: 25px; border-radius: 12px; width: 300px; text-align: center; color: #333; }
+        
+        .admin-panel { 
+            max-width: 1200px; 
+            margin: 0 auto 25px auto; 
+            background: var(--container-bg); 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04); 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 12px; 
+            border: 1px solid var(--border);
+        }
+        
+        .admin-panel input, .admin-panel select { 
+            padding: 10px; 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            background: var(--bg-color); 
+            color: var(--text-header); 
+            font-family: inherit;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .admin-panel input:focus, .admin-panel select:focus {
+            border-color: var(--accent);
+        }
+
+        .bill-container { 
+            max-width: 1200px; 
+            margin: 20px auto; 
+            background: var(--container-bg); 
+            padding: 0; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        
+        .month-header { 
+            padding: 15px 20px; 
+            background: var(--bg-color);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .month-header h2 { margin: 0; color: var(--text-header); font-size: 18px; font-weight: 700; }
+        .month-date-sub { font-size: 12px; color: #7f8c8d; font-weight: 600; }
+        
+        .table-wrapper { overflow-x: auto; padding: 0 20px 20px 20px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; margin-top: 10px; }
+        thead tr { background: transparent; }
+        th { 
+            padding: 12px 10px; 
+            color: #627d98; 
+            font-weight: 600; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            border-bottom: 2px solid var(--border);
+            text-align: left;
+        }
+        td { 
+            padding: 12px 10px; 
+            border-bottom: 1px solid var(--border); 
+            font-size: 13px; 
+            color: var(--text-header);
+            text-align: left;
+            vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+        
+        .status-pill { 
+            padding: 5px 10px; 
+            border-radius: 20px; 
+            font-size: 10px; 
+            font-weight: 700; 
+            letter-spacing: 0.5px;
+            display: inline-block;
+            text-align: center;
+        }
+        .status-paid { background: #e3fcef; color: var(--success); }
+        .status-unpaid { background: #ffebe6; color: var(--danger); }
+        .status-partial { background: #fffae6; color: var(--warning); }
+        
+        .sub-text { font-size: 11px; display: block; margin-top: 4px; font-weight: 600; }
+        
+        /* Modals */
+        .modal { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(16, 42, 67, 0.7); 
+            backdrop-filter: blur(4px);
+            align-items: center; justify-content: center; z-index: 9999; 
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal.active { opacity: 1; }
+        
+        .modal-box { 
+            background: var(--container-bg); 
+            padding: 25px; 
+            border-radius: 12px; 
+            width: 90%; 
+            max-width: 320px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        .modal.active .modal-box { transform: translateY(0); }
+        
+        .modal-box h3 { margin-top: 0; color: var(--text-header); margin-bottom: 8px; font-size:18px;}
+        .modal-input {
+            width: 100%; padding: 10px; margin: 8px 0; 
+            border: 1px solid var(--border); border-radius: 6px;
+            box-sizing: border-box; background: var(--bg-color); color: var(--text-header);
+            font-family: inherit;
+        }
+        .modal-input:focus { border-color: var(--accent); outline: none; }
         
         .no-print { display: block; }
         .only-print { display: none; }
+        
+        /* Action buttons in table */
+        .action-btns { display: flex; gap: 5px; }
+        .btn-icon {
+            padding: 5px 8px; border-radius: 4px; border: none; font-size: 11px; font-weight: 600; cursor: pointer; color: white; transition: 0.2s;
+        }
+
+        /* Loading Spinner */
+        #dataLoader {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 4px solid var(--border);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
     </style>
 </head>
 <body onload="setupYearMonth()">
 
-    <!-- Header locked to original English look -->
-    <h1 class="header-3d no-print" id="mainTitle">Cloud Billing 2026</h1>
+    <h1 class="header-3d no-print" id="mainTitle">Electricity Billing</h1>
     
     <div class="lang-btn-container no-print">
         <button class="btn-lang-big" onclick="toggleLanguage()" id="langBtn">हिंदी</button>
     </div>
 
+    <!-- Nav bar -->
     <div class="nav-container no-print">
-        <span id="syncIcon" style="color: #27ae60; font-size: 12px; font-weight: bold;">● Cloud Linked</span>
+        <!-- HIDDEN ADMIN TRIGGER: Double click this Cloud Linked icon to login -->
+        <span id="syncIcon" ondblclick="triggerGoogleLogin()" title="Sync Status">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span id="syncText">Cloud Linked</span>
+        </span>
         <div class="nav-actions">
-            <button class="btn-blue" onclick="toggleTheme()" style="background:#7f8c8d;" id="themeBtn">🌓 Theme</button>
-            <a href="Pre.html" class="btn-blue" style="text-decoration:none;" id="historyBtn">↺ History</a>
-            <button class="btn-blue" id="loginBtn" onclick="openLogin()" style="background:#e74c3c;">🔐 Admin Access</button>
+            <button class="btn-blue" onclick="toggleTheme()" style="background:#627d98;" id="themeBtn">🌓 Theme</button>
+            <a href="Pre.html" class="btn-blue" style="text-decoration:none; background:#829ab1;" id="historyBtn">↺ History</a>
+            <!-- Logout Button (Hidden by default, shows only when admin is logged in) -->
+            <button class="btn-blue" id="logoutBtn" onclick="logoutAdmin()" style="background:var(--danger); display:none;">🚪 Logout</button>
         </div>
     </div>
 
@@ -73,12 +295,18 @@
             <input type="number" id="oldR" placeholder="Old Reading">
             <input type="number" id="newR" placeholder="New Reading">
             <input type="number" id="balanceCarry" placeholder="Prev. Bill (+/-)">
-            <button onclick="addRow()" class="btn-blue" style="background:#27ae60;" id="addEntryBtn">+ Add Entry</button>
-            <button onclick="downloadPDF()" class="btn-blue" style="background:#e67e22;" id="pdfBtn">📄 Save PDF</button>
-            <button onclick="exportData()" class="btn-blue" style="background:#8e44ad;" id="backupBtn">📥 Backup</button>
+            <button onclick="addRow()" class="btn-blue" style="background:var(--success);" id="addEntryBtn">+ Add Entry</button>
+            <button onclick="downloadPDF()" class="btn-blue" style="background:var(--warning);" id="pdfBtn">📄 Save PDF</button>
+            <button onclick="exportData()" class="btn-blue" style="background:#6554c0;" id="backupBtn">📥 Backup</button>
             <input type="file" id="importFile" style="display:none;" onchange="importData(event)">
-            <button onclick="document.getElementById('importFile').click()" class="btn-blue" style="background:#2c3e50;" id="restoreBtn">📤 Restore</button>
+            <button onclick="document.getElementById('importFile').click()" class="btn-blue" style="background:#42526e;" id="restoreBtn">📤 Restore</button>
         </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="dataLoader">
+        <div class="spinner"></div>
+        <span id="loadingText">Fetching Cloud Data...</span>
     </div>
 
     <div id="pdfWrapper">
@@ -88,26 +316,21 @@
     <div id="editModal" class="modal">
         <div class="modal-box">
             <h3 id="modalEditTitle">Update Record</h3>
-            <p id="editInfo" style="font-size:11px; color:#666;"></p>
+            <p id="editInfo" style="font-size:12px; color:#829ab1; margin-top:0;"></p>
             <input type="hidden" id="editId">
-            <input type="number" id="editPaid" placeholder="Amount Received" style="width:90%; padding:10px; margin:10px 0; border:1px solid #ddd;">
-            <input type="number" id="editBalance" placeholder="Edit Prev. Bill" style="width:90%; padding:10px; margin:10px 0; border:1px solid #ddd;">
-            <button onclick="saveEdit()" class="btn-blue" style="width:100%; background:#27ae60;" id="modalSyncBtn">Sync Changes</button>
-            <button onclick="closeModal('editModal')" style="background:none; border:none; color:red; margin-top:15px; cursor:pointer; font-weight:bold;" id="modalCancelBtn1">Cancel</button>
-        </div>
-    </div>
-
-    <div id="loginModal" class="modal">
-        <div class="modal-box">
-            <h3>Admin Identity</h3>
-            <input type="text" id="adminId" placeholder="User ID" style="width:90%; padding:10px; margin:5px 0;">
-            <input type="password" id="adminPass" placeholder="Password" style="width:90%; padding:10px; margin:5px 0;">
-            <button onclick="checkLogin()" class="btn-blue" style="width:100%; margin-top:10px;" id="modalLoginBtn">Login</button>
-            <button onclick="closeModal('loginModal')" style="background:none; border:none; color:red; margin-top:15px; cursor:pointer;" id="modalCancelBtn2">Cancel</button>
+            <input type="number" id="editPaid" class="modal-input" placeholder="Amount Received">
+            <input type="number" id="editBalance" class="modal-input" placeholder="Edit Prev. Bill">
+            <button onclick="saveEdit()" class="btn-blue" style="width:100%; background:var(--success); margin-top:10px; padding:10px;" id="modalSyncBtn">Sync Changes</button>
+            <button onclick="closeModal('editModal')" style="background:none; border:none; color:var(--danger); width:100%; margin-top:5px; padding:10px; cursor:pointer; font-weight:600;" id="modalCancelBtn1">Cancel</button>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // 🔒 SECURITY SETTING: Change this email!
+        // ==========================================
+        const ADMIN_EMAIL = "priyanshu25072007@gmail.com"; 
+
         const firebaseConfig = {
             apiKey: "AIzaSyCoEyQf22lNxJLGPttZxjMiiu4OGQhXsZk",
             authDomain: "myelectricitybill-49244.firebaseapp.com",
@@ -117,19 +340,63 @@
             messagingSenderId: "343702698525",
             appId: "1:343702698525:web:2c46f3b5597bde55b4a4f4"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        const auth = firebase.auth();
+        const googleProvider = new firebase.auth.GoogleAuthProvider();
+
         let isAdmin = false, globalData = [];
-        
         let currentLang = "en"; 
 
+        // ----------------------------------------------------
+        // FIREBASE AUTHENTICATION (Persistent Login State)
+        // ----------------------------------------------------
+        auth.onAuthStateChanged((user) => {
+            if (user && user.email === ADMIN_EMAIL) {
+                // User is logged in AND is the correct admin
+                isAdmin = true;
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('logoutBtn').style.display = 'inline-block';
+            } else {
+                // User is logged out OR wrong email
+                isAdmin = false;
+                document.getElementById('adminPanel').style.display = 'none';
+                document.getElementById('logoutBtn').style.display = 'none';
+                
+                if (user && user.email !== ADMIN_EMAIL) {
+                    alert((currentLang === "hi") ? "लॉगिन असफल: आप एडमिन नहीं हैं!" : "Access Denied: You are not the admin!");
+                    auth.signOut(); // Kick out wrong user
+                }
+            }
+            // Refresh tables to show/hide edit buttons
+            displayAllTables(globalData);
+        });
+
+        // Triggered by double-clicking "Cloud Linked"
+        function triggerGoogleLogin() {
+            if(!isAdmin) {
+                auth.signInWithPopup(googleProvider).catch((error) => {
+                    console.error("Login Error:", error);
+                    alert("Login Failed!");
+                });
+            }
+        }
+
+        function logoutAdmin() {
+            auth.signOut().then(() => {
+                alert((currentLang === "hi") ? "सफलतापूर्वक लॉगआउट हो गया।" : "Logged out successfully.");
+            });
+        }
+        // ----------------------------------------------------
+
         db.ref('billingData').on('value', (snap) => {
+            document.getElementById('dataLoader').style.display = 'none';
             globalData = snap.val() ? Object.values(snap.val()) : [];
             displayAllTables(globalData);
             updateNameSuggestions(globalData);
         });
 
-        // Setup drop down months to stay strictly in English
         function setupYearMonth() {
             const select = document.getElementById('inputMonth');
             select.innerHTML = '';
@@ -147,10 +414,11 @@
             
             if(currentLang === "hi") {
                 document.getElementById('langBtn').innerText = "English";
-                document.getElementById('syncIcon').innerText = "● क्लाउड लिंक सुरक्षित";
-                document.getElementById('themeBtn').innerText = "官 थीम बदलें";
-                document.getElementById('historyBtn').innerText = "↺ इतिहास देखें";
-                if(document.getElementById('loginBtn')) document.getElementById('loginBtn').innerText = "🔐 एडमिन लॉगिन";
+                document.getElementById('syncText').innerText = " क्लाउड सुरक्षित";
+                document.getElementById('themeBtn').innerText = "🌓 थीम";
+                document.getElementById('historyBtn').innerText = "↺ इतिहास";
+                document.getElementById('logoutBtn').innerText = "🚪 लॉगआउट";
+                document.getElementById('loadingText').innerText = "डेटा लोड हो रहा है...";
                 
                 document.getElementById('name').placeholder = "पूरा नाम दर्ज करें";
                 document.getElementById('oldR').placeholder = "पुरानी रीडिंग";
@@ -162,10 +430,11 @@
                 document.getElementById('restoreBtn').innerText = "📤 रिस्टोर करें";
             } else {
                 document.getElementById('langBtn').innerText = "हिंदी";
-                document.getElementById('syncIcon').innerText = "● Cloud Linked";
+                document.getElementById('syncText').innerText = " Cloud Linked";
                 document.getElementById('themeBtn').innerText = "🌓 Theme";
                 document.getElementById('historyBtn').innerText = "↺ History";
-                if(document.getElementById('loginBtn')) document.getElementById('loginBtn').innerText = "🔐 Admin Access";
+                document.getElementById('logoutBtn').innerText = "🚪 Logout";
+                document.getElementById('loadingText').innerText = "Fetching Cloud Data...";
                 
                 document.getElementById('name').placeholder = "Full Name";
                 document.getElementById('oldR').placeholder = "Old Reading";
@@ -191,7 +460,7 @@
 
             const labels = {
                 en: { name: "Name", reading: "Reading", units: "Units", curBill: "Current Bill", prevBill: "Prev. Bill", totalBill: "Total Bill", received: "Received", status: "Status", rem: "Rem", adv: "Adv", settled: "Settled", paid: "PAID", unpaid: "UNPAID", partial: "PARTIAL", action: "Action" },
-                hi: { name: "नाम", reading: "रीडिंग", units: "खपत", curBill: "वर्त्तमान bill", prevBill: "पुराना बिल", totalBill: "कुल बिल", received: "प्राप्त", status: "स्थिति", rem: "बकाया", adv: "अधिक", settled: "बराबर", paid: "चुक्ता", unpaid: "बाकी", partial: "आंशिक", action: "एक्शन" }
+                hi: { name: "नाम", reading: "रीडिंग", units: "खपत", curBill: "वर्त्तमान बिल", prevBill: "पुराना बिल", totalBill: "कुल बिल", received: "प्राप्त", status: "स्थिति", rem: "बकाया", adv: "अधिक", settled: "बराबर", paid: "चुक्ता", unpaid: "बाकी", partial: "आंशिक", action: "एक्शन" }
             }[currentLang];
 
             sortedMonths.forEach(month => {
@@ -200,26 +469,25 @@
 
                 let html = `<div class="bill-container">
                     <div class="month-header">
-                        <!-- Month Header is forced to stay in English -->
-                        <h2 style="color:var(--accent); margin:0; line-height:1;">${month}</h2>
+                        <h2>${month}</h2>
                         <div class="month-date-sub">${tableDate}</div>
                     </div>
-                    <div style="overflow-x:auto;"><table><thead><tr>
-                        <th style="width:15%">${labels.name}</th>
+                    <div class="table-wrapper"><table><thead><tr>
+                        <th style="width:16%">${labels.name}</th>
                         <th style="width:15%">${labels.reading}</th>
-                        <th style="width:10%">${labels.units}</th>
+                        <th style="width:7%">${labels.units}</th>
                         <th style="width:12%">${labels.curBill}</th>
-                        <th style="width:12%">${labels.prevBill}</th>
+                        <th style="width:10%">${labels.prevBill}</th>
                         <th style="width:12%">${labels.totalBill}</th>
                         <th style="width:14%">${labels.received}</th>
                         <th style="width:10%">${labels.status}</th>
-                        ${isAdmin ? `<th class="no-print" style="width:100px;">${labels.action}</th>` : ''}
+                        ${isAdmin ? `<th class="no-print" style="width:10%; text-align:center;">${labels.action}</th>` : ''}
                     </tr></thead><tbody>`;
 
                 monthData.forEach(item => {
                     const units = item.newR - item.oldR, current = units * 10, prev = item.bal || 0, total = current + prev, received = item.paid || 0, diff = total - received;
                     
-                    let extra = diff > 0 ? `<span class="sub-text" style="color:#e74c3c;">${labels.rem}: ₹${diff}</span>` : (diff < 0 ? `<span class="sub-text" style="color:#2980b9;">${labels.adv}: ₹${Math.abs(diff)}</span>` : `<span class="sub-text" style="color:#7f8c8d;">${labels.settled}</span>`);
+                    let extra = diff > 0 ? `<span class="sub-text" style="color:var(--danger);">${labels.rem}: ₹${diff}</span>` : (diff < 0 ? `<span class="sub-text" style="color:var(--accent);">${labels.adv}: ₹${Math.abs(diff)}</span>` : `<span class="sub-text" style="color:#829ab1;">${labels.settled}</span>`);
                     
                     let statusText = labels.unpaid;
                     let statusClass = "status-unpaid";
@@ -227,16 +495,20 @@
                     else if(item.status === 'PARTIAL') { statusText = labels.partial; statusClass = "status-partial"; }
 
                     html += `<tr>
-                        <!-- Consumer Names are strictly left untouched in English -->
-                        <td><b>${item.name}</b></td>
-                        <td>${item.oldR}→${item.newR}</td>
-                        <td>${units}</td>
-                        <td style="color:#3498db; font-weight:bold;">₹${current}</td>
-                        <td style="color:${prev >= 0 ? '#e67e22' : '#27ae60'}; font-weight:600;">${prev >= 0 ? '+' : ''}${prev}</td>
-                        <td style="font-weight:bold; background:rgba(0,0,0,0.03);">₹${total}</td>
-                        <td><b style="color:#27ae60;">₹${received}</b>${extra}</td>
+                        <td><b style="color:var(--text-header);">${item.name}</b></td>
+                        <td style="color:#627d98; white-space: nowrap;">${item.oldR} <span style="font-size:10px;">→</span> ${item.newR}</td>
+                        <td style="font-weight:600;">${units}</td>
+                        <td style="color:var(--accent); font-weight:700;">₹${current}</td>
+                        <td style="color:${prev >= 0 ? 'var(--warning)' : 'var(--success)'}; font-weight:600;">${prev >= 0 ? '+' : ''}${prev}</td>
+                        <td style="font-weight:700; font-size:14px;">₹${total}</td>
+                        <td><b style="color:var(--success);">₹${received}</b>${extra}</td>
                         <td><span class="status-pill ${statusClass}">${statusText}</span></td>
-                        ${isAdmin ? `<td class="no-print"><button onclick="openEdit(${item.id})" style="background:#f39c12; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:10px;">${currentLang === "hi" ? "बदलें" : "Edit"}</button> <button onclick="deleteRow(${item.id})" style="background:#ff4757; color:white; border:none; padding:4px 8px; border-radius:3px; cursor:pointer; font-size:10px;">${currentLang === "hi" ? "हटाएं" : "Del"}</button></td>` : ''}
+                        ${isAdmin ? `<td class="no-print">
+                            <div class="action-btns">
+                                <button class="btn-icon" onclick="openEdit(${item.id})" style="background:var(--warning);">${currentLang === "hi" ? "बदलें" : "Edit"}</button> 
+                                <button class="btn-icon" onclick="deleteRow(${item.id})" style="background:var(--danger);">${currentLang === "hi" ? "हटाएं" : "Del"}</button>
+                            </div>
+                        </td>` : ''}
                     </tr>`;
                 });
                 container.innerHTML += html + `</tbody></table></div></div>`;
@@ -288,12 +560,6 @@
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Cloud_Backup.json`; a.click();
         }
 
-        function checkLogin() {
-            if(btoa(document.getElementById('adminId').value) === "dmlzaWJsZwvnbw==" || btoa(document.getElementById('adminId').value) === "dmlzaWJsZWVnbw==" && btoa(document.getElementById('adminPass').value) === "bG9ja2Rvd24yMDE5") {
-                isAdmin = true; document.getElementById('adminPanel').style.display = 'block'; document.getElementById('loginBtn').style.display = 'none'; closeModal('loginModal'); displayAllTables(globalData);
-            } else { alert((currentLang === "hi") ? "लॉगिन असफल!" : "Failed!"); }
-        }
-
         function addRow() {
             const entry = { id: Date.now(), month: document.getElementById('inputMonth').value, date: document.getElementById('inputDate').value, name: document.getElementById('name').value, oldR: parseInt(document.getElementById('oldR').value) || 0, newR: parseInt(document.getElementById('newR').value) || 0, bal: parseInt(document.getElementById('balanceCarry').value) || 0, paid: 0, status: "NOT PAID" };
             if(!entry.name) return alert((currentLang === "hi") ? "नाम डालना अनिवार्य है!" : "Name required!");
@@ -302,24 +568,77 @@
         }
 
         function saveEdit() {
-            const id = document.getElementById('editId').value, paid = parseInt(document.getElementById('editPaid').value) || 0, bal = parseInt(document.getElementById('editBalance').value) || 0;
-            const item = globalData.find(i => i.id == id), total = ((item.newR - item.oldR) * 10) + bal;
-            db.ref('billingData/' + id).update({ paid, bal, status: (paid >= total) ? "PAID" : (paid > 0 ? "PARTIAL" : "NOT PAID") });
-            closeModal('editModal');
+            const id = document.getElementById('editId').value;
+            const paid = parseInt(document.getElementById('editPaid').value) || 0;
+            const bal = parseInt(document.getElementById('editBalance').value) || 0;
+
+            const editedItem = globalData.find(i => i.id == id);
+            if (!editedItem) return;
+
+            const userName = editedItem.name;
+            const currentTotal = ((editedItem.newR - editedItem.oldR) * 10) + bal;
+            const currentStatus = (paid >= currentTotal) ? "PAID" : (paid > 0 ? "PARTIAL" : "NOT PAID");
+
+            let updates = {};
+            
+            updates['billingData/' + id + '/paid'] = paid;
+            updates['billingData/' + id + '/bal'] = bal;
+            updates['billingData/' + id + '/status'] = currentStatus;
+
+            const userRecords = globalData.filter(i => i.name === userName).sort((a, b) => a.id - b.id);
+
+            let previousLeftover = currentTotal - paid;
+            let startUpdatingNext = false;
+
+            for (let i = 0; i < userRecords.length; i++) {
+                let record = userRecords[i];
+
+                if (startUpdatingNext) {
+                    let newBal = previousLeftover;
+                    let recordTotal = ((record.newR - record.oldR) * 10) + newBal;
+                    let recordStatus = ((record.paid || 0) >= recordTotal) ? "PAID" : ((record.paid || 0) > 0 ? "PARTIAL" : "NOT PAID");
+
+                    updates['billingData/' + record.id + '/bal'] = newBal;
+                    updates['billingData/' + record.id + '/status'] = recordStatus;
+
+                    previousLeftover = recordTotal - (record.paid || 0);
+                }
+
+                if (record.id == id) {
+                    startUpdatingNext = true;
+                }
+            }
+
+            db.ref().update(updates).then(() => {
+                closeModal('editModal');
+            }).catch(error => {
+                alert("Update failed: " + error);
+            });
         }
 
         function deleteRow(id) { 
             const msg = (currentLang === "hi") ? "क्या आप इस रिकॉर्ड को हटाना चाहते हैं?" : "Delete record?";
             if(confirm(msg)) db.ref('billingData/' + id).remove(); 
         }
-        function openLogin() { document.getElementById('loginModal').style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        
+        function closeModal(id) { 
+            const modal = document.getElementById(id);
+            modal.classList.remove('active');
+            setTimeout(() => modal.style.display = 'none', 300);
+        }
+        
         function openEdit(id) {
             const item = globalData.find(i => i.id == id);
-            document.getElementById('editId').value = id; document.getElementById('editPaid').value = item.paid; document.getElementById('editBalance').value = item.bal; 
+            document.getElementById('editId').value = id; 
+            document.getElementById('editPaid').value = item.paid; 
+            document.getElementById('editBalance').value = item.bal; 
             document.getElementById('editInfo').innerText = (currentLang === "hi") ? `नाम: ${item.name}` : `Record: ${item.name}`; 
-            document.getElementById('editModal').style.display = 'flex';
+            
+            const modal = document.getElementById('editModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
         }
+        
         function toggleTheme() { document.body.getAttribute('data-theme')==='dark'?document.body.removeAttribute('data-theme'):document.body.setAttribute('data-theme','dark'); }
         
         function autoFillDetails(val) {
