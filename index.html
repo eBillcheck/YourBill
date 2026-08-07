@@ -5,10 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Electricity Billing</title>
     
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (Auth removed as requested) -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 
     <style>
@@ -90,7 +89,14 @@
             color: var(--success);
             font-size: 12px;
             font-weight: 600;
+            cursor: pointer; /* Pointer to show it's clickable */
             user-select: none;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        #syncIcon:hover {
+            background: rgba(0, 135, 90, 0.1);
         }
 
         .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -272,16 +278,14 @@
 
     <!-- Nav bar -->
     <div class="nav-container no-print">
-        <span id="syncIcon" title="Sync Status">
+        <!-- Click 'Cloud Linked' to open login -->
+        <span id="syncIcon" onclick="openLogin()" title="Admin Access">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
             <span id="syncText">Cloud Linked</span>
         </span>
         <div class="nav-actions">
             <button class="btn-blue" onclick="toggleTheme()" style="background:#627d98;" id="themeBtn">🌓 Theme</button>
             <a href="Pre.html" class="btn-blue" style="text-decoration:none; background:#829ab1;" id="historyBtn">↺ History</a>
-            
-            <!-- Login Button with Lock Icon -->
-            <button class="btn-blue" id="loginBtn" onclick="triggerGoogleLogin()" style="background:var(--danger);">🔒 Login</button>
             
             <!-- Logout Button (Hidden by default) -->
             <button class="btn-blue" id="logoutBtn" onclick="logoutAdmin()" style="background:var(--danger); display:none;">🚪 Logout</button>
@@ -327,10 +331,18 @@
         </div>
     </div>
 
-    <script>
-        // AAPKI EMAIL YAHAN SET HAI 👇
-        const ADMIN_EMAIL = "priyanshu25072007@gmail.com"; 
+    <!-- Password Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-box">
+            <h3>Admin Identity</h3>
+            <p style="font-size:12px; color:#829ab1; margin-top:0;">Enter password to unlock controls.</p>
+            <input type="password" id="adminPass" class="modal-input" placeholder="Password">
+            <button onclick="checkLogin()" class="btn-blue" style="width:100%; margin-top:10px; padding:10px;" id="modalLoginBtn">Login</button>
+            <button onclick="closeModal('loginModal')" style="background:none; border:none; color:var(--danger); width:100%; margin-top:5px; padding:10px; cursor:pointer; font-weight:600;" id="modalCancelBtn2">Cancel</button>
+        </div>
+    </div>
 
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCoEyQf22lNxJLGPttZxjMiiu4OGQhXsZk",
             authDomain: "myelectricitybill-49244.firebaseapp.com",
@@ -343,53 +355,9 @@
         
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const auth = firebase.auth();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
 
         let isAdmin = false, globalData = [];
         let currentLang = "en"; 
-
-        // ----------------------------------------------------
-        // FIREBASE AUTHENTICATION LOGIC
-        // ----------------------------------------------------
-        auth.onAuthStateChanged((user) => {
-            if (user && user.email === ADMIN_EMAIL) {
-                // Sahi user ne login kiya hai
-                isAdmin = true;
-                document.getElementById('adminPanel').style.display = 'block';
-                document.getElementById('logoutBtn').style.display = 'inline-block';
-                document.getElementById('loginBtn').style.display = 'none';
-            } else {
-                // Logged out hai ya galat email hai
-                isAdmin = false;
-                document.getElementById('adminPanel').style.display = 'none';
-                document.getElementById('logoutBtn').style.display = 'none';
-                document.getElementById('loginBtn').style.display = 'inline-block';
-                
-                if (user && user.email !== ADMIN_EMAIL) {
-                    alert((currentLang === "hi") ? "लॉगिन असफल: आप एडमिन नहीं हैं!" : "Access Denied: You are not the admin!");
-                    auth.signOut(); // Galat user ko kick out kar do
-                }
-            }
-            displayAllTables(globalData);
-        });
-
-        // Triggered by Login Button
-        function triggerGoogleLogin() {
-            if(!isAdmin) {
-                auth.signInWithPopup(googleProvider).catch((error) => {
-                    console.error("Login Error:", error);
-                    alert("Login Failed: " + error.message);
-                });
-            }
-        }
-
-        function logoutAdmin() {
-            auth.signOut().then(() => {
-                alert((currentLang === "hi") ? "सफलतापूर्वक लॉगआउट हो गया।" : "Logged out successfully.");
-            });
-        }
-        // ----------------------------------------------------
 
         db.ref('billingData').on('value', (snap) => {
             document.getElementById('dataLoader').style.display = 'none';
@@ -397,6 +365,41 @@
             displayAllTables(globalData);
             updateNameSuggestions(globalData);
         });
+
+        // ----------------------------------------------------
+        // MANUAL LOGIN LOGIC
+        // ----------------------------------------------------
+        function openLogin() {
+            if(!isAdmin) {
+                const modal = document.getElementById('loginModal');
+                modal.style.display = 'flex'; 
+                setTimeout(() => modal.classList.add('active'), 10);
+            }
+        }
+
+        function checkLogin() {
+            const pass = document.getElementById('adminPass').value;
+            // Password checked here
+            if(pass === "whistle2029") {
+                isAdmin = true; 
+                document.getElementById('adminPanel').style.display = 'block'; 
+                document.getElementById('logoutBtn').style.display = 'inline-block'; 
+                closeModal('loginModal'); 
+                document.getElementById('adminPass').value = '';
+                displayAllTables(globalData); // Refresh tables for edit/delete buttons
+            } else { 
+                alert((currentLang === "hi") ? "गलत पासवर्ड!" : "Incorrect Password!"); 
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'none';
+            displayAllTables(globalData); // Hide edit/delete buttons
+            alert((currentLang === "hi") ? "लॉगआउट हो गया।" : "Logged out.");
+        }
+        // ----------------------------------------------------
 
         function setupYearMonth() {
             const select = document.getElementById('inputMonth');
@@ -418,7 +421,6 @@
                 document.getElementById('syncText').innerText = " क्लाउड सुरक्षित";
                 document.getElementById('themeBtn').innerText = "🌓 थीम";
                 document.getElementById('historyBtn').innerText = "↺ इतिहास";
-                if(document.getElementById('loginBtn')) document.getElementById('loginBtn').innerText = "🔒 लॉगिन";
                 document.getElementById('logoutBtn').innerText = "🚪 लॉगआउट";
                 document.getElementById('loadingText').innerText = "डेटा लोड हो रहा है...";
                 
@@ -435,7 +437,6 @@
                 document.getElementById('syncText').innerText = " Cloud Linked";
                 document.getElementById('themeBtn').innerText = "🌓 Theme";
                 document.getElementById('historyBtn').innerText = "↺ History";
-                if(document.getElementById('loginBtn')) document.getElementById('loginBtn').innerText = "🔒 Login";
                 document.getElementById('logoutBtn').innerText = "🚪 Logout";
                 document.getElementById('loadingText').innerText = "Fetching Cloud Data...";
                 
