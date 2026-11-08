@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Electricity Billing</title>
+    <title>Smart Electricity Billing — Shubh Deepavali</title>
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
@@ -11,84 +11,177 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap');
         
         :root { 
-            --bg-color: #f4f7f6; 
+            --bg-color: #fff9f2; 
             --container-bg: #ffffff; 
             --card-bg: #ffffff;
-            --text-header: #102a43; 
-            --text-body: #334e68;
-            --text-muted: #829ab1;
-            --accent: #0052cc; 
-            --accent-hover: #003e99;
-            --success: #00875a;
-            --success-light: #e3fcef;
-            --danger: #de350b;
-            --danger-light: #ffebe6;
-            --warning: #ff991f;
-            --warning-light: #fffae6;
-            --border: #e2e8f0;
+            --text-header: #4a151b; 
+            --text-body: #5c2c16;
+            --text-muted: #9a6b56;
+            --accent: #d97706; 
+            --accent-hover: #b45309;
+            --accent-red: #b91c1c;
+            --gold: #f59e0b;
+            --gold-light: #fef3c7;
+            --success: #15803d;
+            --success-light: #dcfce7;
+            --danger: #dc2626;
+            --danger-light: #fee2e2;
+            --warning: #d97706;
+            --warning-light: #fef3c7;
+            --border: #fde68a;
         }
         
-        body { background-color: var(--bg-color); font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; color: var(--text-body); padding: 15px 3%; }
+        body { 
+            background-color: var(--bg-color); 
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(245, 158, 11, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(185, 28, 28, 0.06) 0%, transparent 45%);
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s, color 0.3s; 
+            margin: 0; 
+            color: var(--text-body); 
+            padding: 0 3% 25px 3%; 
+            overflow-x: hidden;
+        }
+
+        /* Decorative Toran / String Lights Header */
+        .diwali-toran {
+            max-width: 1200px;
+            margin: 0 auto 8px auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding: 0 10px;
+            pointer-events: none;
+            user-select: none;
+        }
+        .toran-bulb {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: swing 3s ease-in-out infinite alternate;
+            transform-origin: top center;
+        }
+        .toran-bulb:nth-child(even) { animation-duration: 3.6s; animation-delay: 0.4s; }
+        .toran-wire { width: 2px; height: 12px; background: #d97706; }
+        .toran-light {
+            width: 10px; height: 14px; border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+            background: radial-gradient(circle at 40% 40%, #fffbeb, #f59e0b, #d97706);
+            box-shadow: 0 0 10px 2px rgba(245, 158, 11, 0.75);
+            animation: glowPulse 1.8s ease-in-out infinite alternate;
+        }
+        .toran-bulb:nth-child(3n) .toran-light {
+            background: radial-gradient(circle at 40% 40%, #fff1f2, #f43f5e, #be123c);
+            box-shadow: 0 0 10px 2px rgba(244, 63, 94, 0.65);
+            animation-delay: 0.6s;
+        }
+        @keyframes swing { 0% { transform: rotate(-4deg); } 100% { transform: rotate(4deg); } }
+        @keyframes glowPulse { 0% { opacity: 0.75; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1.08); } }
+
+        /* Animated SVG Diya */
+        .diya-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            vertical-align: middle;
+            filter: drop-shadow(0 2px 6px rgba(217, 119, 6, 0.4));
+        }
+        .diya-flame {
+            animation: flickerFlame 1.2s ease-in-out infinite alternate;
+            transform-origin: center bottom;
+        }
+        @keyframes flickerFlame {
+            0% { transform: scaleY(0.92) scaleX(0.96) rotate(-2deg); opacity: 0.9; }
+            50% { transform: scaleY(1.08) scaleX(1.03) rotate(2deg); opacity: 1; }
+            100% { transform: scaleY(0.97) scaleX(0.94) rotate(-1deg); opacity: 0.95; }
+        }
         
-        /* Premium Gradient Heading (Emoji Removed) */
+        /* Festive Gradient Heading */
         .header-main { 
-            text-align: center; font-size: clamp(26px, 6vw, 36px); font-weight: 800; 
-            margin-bottom: 25px; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-align: center; font-size: clamp(24px, 5.5vw, 34px); font-weight: 800; 
+            margin-bottom: 18px; margin-top: 4px; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .header-main span { 
-            background: linear-gradient(135deg, var(--accent) 0%, #8a2be2 100%);
+            background: linear-gradient(135deg, #991b1b 0%, #d97706 50%, #b45309 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px;
         }
         
         .nav-container { 
-            max-width: 1200px; margin: 0 auto 25px auto; display: flex; justify-content: space-between; 
-            align-items: center; flex-wrap: wrap; gap: 15px; background: var(--container-bg); 
-            padding: 12px 20px; border-radius: 50px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
-            border: 1px solid var(--border);
+            max-width: 1200px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; 
+            align-items: center; flex-wrap: wrap; gap: 12px; 
+            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+            padding: 10px 18px; border-radius: 50px; 
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.08); 
+            border: 1.5px solid var(--border);
         }
         
         #syncIcon { display: flex; align-items: center; gap: 6px; color: var(--success); font-size: 13px; font-weight: 700; cursor: pointer; user-select: none; padding: 5px 10px; border-radius: 20px; transition: background 0.2s; }
         #syncIcon:hover { background: var(--success-light); }
         .nav-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;}
-        .btn-tool { background: transparent; color: var(--text-header); padding: 8px 16px; border-radius: 30px; font-weight: 600; border: 1px solid var(--border); cursor: pointer; font-size: 12px; transition: all 0.2s; display: flex; align-items: center; gap: 5px; text-decoration: none;}
-        .btn-tool:hover { background: var(--bg-color); border-color: var(--text-muted); }
-        .btn-blue { background: var(--accent); color: white; padding: 7px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; font-size: 12px; transition: opacity 0.2s; }
+        .btn-tool { background: #ffffff; color: var(--text-header); padding: 7px 14px; border-radius: 30px; font-weight: 600; border: 1px solid var(--border); cursor: pointer; font-size: 12px; transition: all 0.2s; display: flex; align-items: center; gap: 5px; text-decoration: none; box-shadow: 0 2px 5px rgba(217,119,6,0.05);}
+        .btn-tool:hover { background: var(--gold-light); border-color: var(--gold); transform: translateY(-1px); }
+        .btn-tool.btn-diwali { background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; border: none; box-shadow: 0 3px 10px rgba(217, 119, 6, 0.3); }
+        .btn-tool.btn-diwali:hover { background: linear-gradient(135deg, #d97706, #b45309); }
+        .btn-blue { background: linear-gradient(135deg, #d97706, #b45309); color: white; padding: 7px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; font-size: 12px; transition: opacity 0.2s; }
         .btn-blue:hover { opacity: 0.9; }
 
         #adminPanel { display: none; }
-        .admin-panel { max-width: 1200px; margin: 0 auto 25px auto; background: var(--container-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.04); display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; border: 1px solid var(--border); }
+        .admin-panel { max-width: 1200px; margin: 0 auto 20px auto; background: var(--container-bg); padding: 18px; border-radius: 12px; box-shadow: 0 4px 15px rgba(217,119,6,0.06); display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; border: 1.5px solid var(--border); }
         .admin-panel input, .admin-panel select { padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-color); color: var(--text-header); font-family: inherit; font-size: 13px; outline: none; }
         .admin-panel input:focus, .admin-panel select:focus { border-color: var(--accent); }
 
-        .bill-container { max-width: 1200px; margin: 15px auto; background: transparent; padding: 0; }
-        .month-header { padding: 15px 20px; background: var(--container-bg); border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); cursor: pointer; user-select: none; transition: background 0.2s; }
-        .month-header:hover { background: var(--bg-color); }
-        .month-header-left h2 { margin: 0; color: var(--text-header); font-size: 18px; font-weight: 800; }
-        .month-date-sub { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
-        .toggle-icon { display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: transform 0.3s ease; }
+        /* Reduced font & compact spacing for Month Blocks (e.g. October 2026, September 2026) */
+        .bill-container { max-width: 1200px; margin: 8px auto; background: transparent; padding: 0; }
+        .month-header { 
+            padding: 9px 15px; 
+            background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%); 
+            border-radius: 10px; 
+            border: 1.5px solid var(--border); 
+            display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 8px; 
+            box-shadow: 0 2px 8px rgba(217, 119, 6, 0.05); 
+            cursor: pointer; user-select: none; transition: background 0.2s; 
+        }
+        .month-header:hover { background: var(--gold-light); }
+        .month-header-left { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+        .month-header-left h2 { margin: 0; color: var(--text-header); font-size: 14.5px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.2; }
+        .month-date-sub { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 0; }
+        .toggle-icon { display: flex; align-items: center; justify-content: center; color: var(--accent); transition: transform 0.3s ease; }
+        .toggle-icon svg { width: 18px; height: 18px; }
         .month-content { display: none; } 
 
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .bill-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 12px; transition: transform 0.2s, box-shadow 0.2s; page-break-inside: avoid; }
-        .bill-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 18px; }
+        .bill-card { 
+            background: linear-gradient(180deg, #ffffff 0%, #fffdf9 100%); 
+            border: 1.5px solid var(--border); 
+            border-top: 3.5px solid var(--accent);
+            border-radius: 12px; padding: 16px; 
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.06); 
+            display: flex; flex-direction: column; gap: 12px; 
+            transition: transform 0.2s, box-shadow 0.2s; 
+            page-break-inside: avoid; 
+        }
+        .bill-card:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(217, 119, 6, 0.12); }
         .c-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 1px dashed var(--border); padding-bottom: 10px; }
-        .c-name-link { font-size: 17px; font-weight: 700; color: var(--text-header); margin: 0; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: color 0.2s; }
+        .c-name-link { font-size: 16px; font-weight: 700; color: var(--text-header); margin: 0; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: color 0.2s; }
         .c-name-link:hover { color: var(--accent); }
         .c-status { padding: 4px 10px; border-radius: 20px; font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase; text-align: center; }
         .st-paid { background: var(--success-light); color: var(--success); }
         .st-unpaid { background: var(--danger-light); color: var(--danger); }
         .st-partial { background: var(--warning-light); color: var(--warning); }
-        .c-readings { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 8px 12px; border-radius: 6px; }
+        .c-readings { display: flex; justify-content: space-between; align-items: center; background: var(--bg-color); padding: 8px 12px; border-radius: 6px; border: 1px solid #fef3c7; }
         .r-text { font-size: 12px; color: var(--text-muted); font-weight: 500; }
         .r-val { font-size: 14px; font-weight: 700; color: var(--text-header); }
         .u-highlight { font-size: 15px; font-weight: 800; color: var(--accent); display: flex; align-items: center; gap: 6px;}
-        .rate-badge { font-size: 11px; color: #e06c75; font-weight: 800; background: #fff0f2; padding: 2px 6px; border-radius: 4px; }
+        .rate-badge { font-size: 11px; color: #b91c1c; font-weight: 800; background: #fee2e2; padding: 2px 6px; border-radius: 4px; }
         .c-finances { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .f-box { display: flex; flex-direction: column; background: var(--bg-color); padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border); }
-        .f-box.total-box { background: var(--accent); color: white; border-color: var(--accent); }
+        .f-box.total-box { background: linear-gradient(135deg, #b91c1c 0%, #d97706 100%); color: white; border-color: #b45309; }
         .f-box.total-box .f-label, .f-box.total-box .f-val { color: white; }
         .f-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; margin-bottom: 2px; }
         .f-val { font-size: 14px; font-weight: 700; color: var(--text-header); }
@@ -100,11 +193,21 @@
         .c-btn { flex: 1; padding: 6px; border-radius: 4px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; color: white; transition: 0.2s; }
 
         /* Table UI */
-        .table-wrapper { overflow-x: auto; background: var(--container-bg); border-radius: 12px; border: 1px solid var(--border); padding: 15px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02);}
+        .table-wrapper { 
+            overflow-x: auto; 
+            background: var(--container-bg); 
+            border-radius: 12px; 
+            border: 1.5px solid var(--border); 
+            border-top: 3.5px solid var(--accent);
+            padding: 12px 15px; 
+            margin-bottom: 18px; 
+            box-shadow: 0 4px 15px rgba(217, 119, 6, 0.05);
+        }
         table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 900px; }
-        thead tr { background: transparent; }
-        th { padding: 12px 10px; color: var(--text-muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); text-align: left; }
-        td { padding: 12px 10px; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text-header); vertical-align: middle; }
+        thead tr { background: #fffbeb; }
+        th { padding: 10px 10px; color: #92400e; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); text-align: left; }
+        td { padding: 10px 10px; border-bottom: 1px solid #fef3c7; font-size: 13px; color: var(--text-header); vertical-align: middle; }
+        tbody tr:hover { background-color: #fffdf9; }
         tr:last-child td { border-bottom: none; }
         .tbl-name { font-weight: 700; color: var(--text-header); cursor: pointer; display: inline-block; transition: color 0.2s; }
         .tbl-name:hover { color: var(--accent); }
@@ -112,14 +215,77 @@
         .btn-icon { padding: 5px 8px; border-radius: 4px; border: none; font-size: 11px; font-weight: 600; cursor: pointer; color: white; transition: 0.2s; margin-right:4px;}
 
         /* Modals */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 9999; opacity: 0; transition: opacity 0.3s; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(45, 12, 14, 0.72); backdrop-filter: blur(4px); align-items: center; justify-content: center; z-index: 9999; opacity: 0; transition: opacity 0.3s; }
         .modal.active { opacity: 1; }
-        .modal-box { background: var(--container-bg); padding: 25px; border-radius: 12px; width: 90%; max-width: 320px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; }
+        .modal-box { background: var(--container-bg); padding: 25px; border-radius: 14px; width: 90%; max-width: 320px; box-shadow: 0 10px 40px rgba(0,0,0,0.25); border: 1.5px solid var(--border); transform: translateY(20px); transition: transform 0.3s; }
         .modal.active .modal-box { transform: translateY(0); }
         .modal-box h3 { margin-top: 0; color: var(--text-header); margin-bottom: 8px; font-size:18px;}
         .modal-input { width: 100%; padding: 10px; margin: 4px 0; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; background: var(--bg-color); color: var(--text-header); font-family: inherit; }
         .modal-input:focus { border-color: var(--accent); outline: none; }
         .no-print { display: block; }
+
+        /* Diwali Greeting Popup Modal */
+        .diwali-modal-box {
+            max-width: 400px;
+            background: radial-gradient(circle at top, #7f1d1d 0%, #450a0a 100%);
+            border: 2px solid #f59e0b;
+            border-radius: 18px;
+            padding: 26px 22px;
+            text-align: center;
+            color: #fffbeb;
+            box-shadow: 0 0 40px rgba(245, 158, 11, 0.45), inset 0 0 25px rgba(245, 158, 11, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+        .diwali-sparkle-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 10px;
+        }
+        .diwali-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fef08a 0%, #f59e0b 50%, #fde047 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 4px 0 6px 0;
+        }
+        .diwali-hindi-sub {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fde68a;
+            margin-bottom: 12px;
+        }
+        .diwali-msg {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #fef3c7;
+            margin-bottom: 18px;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 12px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+        .diwali-btn {
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            color: #450a0a;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 10px 24px;
+            border-radius: 30px;
+            border: 1px solid #fef08a;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.45);
+            transition: transform 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        .diwali-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.65);
+        }
         
         #historyModal .modal-box { max-width: 450px; max-height: 85vh; display: flex; flex-direction: column; padding: 20px; }
         .history-list { overflow-y: auto; margin-top: 15px; padding-right: 5px; display: flex; flex-direction: column; gap: 12px; }
@@ -133,12 +299,59 @@
         #dataLoader { text-align: center; padding: 40px 20px; color: var(--accent); font-weight: 600; font-size: 15px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
         .spinner { width: 30px; height: 30px; border: 4px solid var(--border); border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Toast Notification */
+        #toastBox {
+            position: fixed; bottom: 24px; right: 24px; z-index: 10005;
+            background: #450a0a; color: #fef3c7; border: 1.5px solid #f59e0b;
+            padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.25); display: none; align-items: center; gap: 8px;
+        }
     </style>
 </head>
 <body onload="setupYearMonth()">
 
+    <!-- Festive String Lights / Toran -->
+    <div class="diwali-toran no-print">
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+        <div class="toran-bulb"><div class="toran-wire"></div><div class="toran-light"></div></div>
+    </div>
+
     <h1 class="header-main no-print">
+        <svg class="diya-icon" viewBox="0 0 64 64" fill="none">
+            <path class="diya-flame" d="M32 6C32 6 23 18 23 25C23 30 27 34 32 34C37 34 41 30 41 25C41 18 32 6 32 6Z" fill="url(#flameGrad1)"/>
+            <path class="diya-flame" d="M32 14C32 14 27 21 27 26C27 29 29.2 31 32 31C34.8 31 37 29 37 26C37 21 32 14 32 14Z" fill="#FFFBEB"/>
+            <path d="M10 34C10 47 20 54 32 54C44 54 54 47 54 34H10Z" fill="url(#baseGrad1)" stroke="#92400E" stroke-width="2"/>
+            <path d="M14 38H50" stroke="#FDE68A" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/>
+            <defs>
+                <linearGradient id="flameGrad1" x1="32" y1="6" x2="32" y2="34" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#FDE047"/>
+                    <stop offset="60%" stop-color="#F59E0B"/>
+                    <stop offset="100%" stop-color="#DC2626"/>
+                </linearGradient>
+                <linearGradient id="baseGrad1" x1="10" y1="34" x2="54" y2="54" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#D97706"/>
+                    <stop offset="50%" stop-color="#B45309"/>
+                    <stop offset="100%" stop-color="#78350F"/>
+                </linearGradient>
+            </defs>
+        </svg>
         <span id="titleText">Smart Billing</span>
+        <svg class="diya-icon" viewBox="0 0 64 64" fill="none">
+            <path class="diya-flame" d="M32 6C32 6 23 18 23 25C23 30 27 34 32 34C37 34 41 30 41 25C41 18 32 6 32 6Z" fill="url(#flameGrad1)"/>
+            <path class="diya-flame" d="M32 14C32 14 27 21 27 26C27 29 29.2 31 32 31C34.8 31 37 29 37 26C37 21 32 14 32 14Z" fill="#FFFBEB"/>
+            <path d="M10 34C10 47 20 54 32 54C44 54 54 47 54 34H10Z" fill="url(#baseGrad1)" stroke="#92400E" stroke-width="2"/>
+            <path d="M14 38H50" stroke="#FDE68A" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/>
+        </svg>
     </h1>
 
     <div class="nav-container no-print">
@@ -147,9 +360,10 @@
             <span id="syncText">Cloud Linked</span>
         </span>
         <div class="nav-actions">
+            <button class="btn-tool btn-diwali" onclick="openDiwaliWish()" id="wishBtn">🪔 Diwali Wish</button>
             <button class="btn-tool" onclick="toggleLanguage()" id="langBtn">🌐 हिंदी</button>
-            <button class="btn-tool" onclick="toggleView()" id="viewBtn">📋 Table View</button>
-            <a href="Pre.html" class="btn-tool" id="historyLinkBtn">↺ History</a>
+            <button class="btn-tool" onclick="toggleView()" id="viewBtn">📇 Card View</button>
+            <button class="btn-tool" onclick="window.location.href='Pre.html'" id="historyLinkBtn">↺ History</button>
             <button class="btn-blue" id="logoutBtn" onclick="logoutAdmin()" style="background:var(--danger); display:none; border-radius:30px;">🚪 Logout</button>
         </div>
     </div>
@@ -178,6 +392,36 @@
 
     <div id="pdfWrapper">
         <div id="dataContainer"></div>
+    </div>
+
+    <!-- Diwali Greeting Popup Modal (Opens every time the page is loaded) -->
+    <div id="diwaliModal" class="modal active" style="display: flex;">
+        <div class="modal-box diwali-modal-box">
+            <div class="diwali-sparkle-row">
+                <svg class="diya-icon" style="width:42px; height:42px;" viewBox="0 0 64 64" fill="none">
+                    <path class="diya-flame" d="M32 6C32 6 23 18 23 25C23 30 27 34 32 34C37 34 41 30 41 25C41 18 32 6 32 6Z" fill="url(#flameGrad1)"/>
+                    <path class="diya-flame" d="M32 14C32 14 27 21 27 26C27 29 29.2 31 32 31C34.8 31 37 29 37 26C37 21 32 14 32 14Z" fill="#FFFBEB"/>
+                    <path d="M10 34C10 47 20 54 32 54C44 54 54 47 54 34H10Z" fill="url(#baseGrad1)" stroke="#FDE68A" stroke-width="2"/>
+                </svg>
+                <svg class="diya-icon" style="width:52px; height:52px;" viewBox="0 0 64 64" fill="none">
+                    <path class="diya-flame" d="M32 6C32 6 23 18 23 25C23 30 27 34 32 34C37 34 41 30 41 25C41 18 32 6 32 6Z" fill="url(#flameGrad1)"/>
+                    <path class="diya-flame" d="M32 14C32 14 27 21 27 26C27 29 29.2 31 32 31C34.8 31 37 29 37 26C37 21 32 14 32 14Z" fill="#FFFBEB"/>
+                    <path d="M10 34C10 47 20 54 32 54C44 54 54 47 54 34H10Z" fill="url(#baseGrad1)" stroke="#FDE68A" stroke-width="2"/>
+                </svg>
+                <svg class="diya-icon" style="width:42px; height:42px;" viewBox="0 0 64 64" fill="none">
+                    <path class="diya-flame" d="M32 6C32 6 23 18 23 25C23 30 27 34 32 34C37 34 41 30 41 25C41 18 32 6 32 6Z" fill="url(#flameGrad1)"/>
+                    <path class="diya-flame" d="M32 14C32 14 27 21 27 26C27 29 29.2 31 32 31C34.8 31 37 29 37 26C37 21 32 14 32 14Z" fill="#FFFBEB"/>
+                    <path d="M10 34C10 47 20 54 32 54C44 54 54 47 54 34H10Z" fill="url(#baseGrad1)" stroke="#FDE68A" stroke-width="2"/>
+                </svg>
+            </div>
+            <div class="diwali-title" id="diwaliPopupTitle">✨ Happy Diwali! ✨</div>
+            <div class="diwali-hindi-sub" id="diwaliPopupSub">शुभ दीपावली की हार्दिक शुभकामनाएँ!</div>
+            <div class="diwali-msg" id="diwaliPopupMsg">
+                दीपों का यह पावन त्योहार आपके और आपके परिवार के जीवन में सुख, शांति, समृद्धि और खुशियों का उजाला लाए।<br><br>
+                May the divine light of Diwali bring peace, prosperity, happiness, and good health to you and your family! 🪔🎉
+            </div>
+            <button class="diwali-btn" onclick="closeModal('diwaliModal')" id="diwaliCloseBtn">🙏 धन्यवाद / Thank You ✨</button>
+        </div>
     </div>
 
     <!-- Edit Modal -->
@@ -210,7 +454,7 @@
     <div id="loginModal" class="modal">
         <div class="modal-box">
             <h3>Admin Identity</h3>
-            <p style="font-size:12px; color:#829ab1; margin-top:0;">Enter password to unlock controls.</p>
+            <p style="font-size:12px; color:var(--text-muted); margin-top:0;">Enter password to unlock controls.</p>
             <input type="password" id="adminPass" class="modal-input" placeholder="Password">
             <button onclick="checkLogin()" class="btn-blue" style="width:100%; margin-top:10px; padding:10px;" id="modalLoginBtn">Login</button>
             <button onclick="closeModal('loginModal')" style="background:none; border:none; color:var(--danger); width:100%; margin-top:5px; padding:10px; cursor:pointer; font-weight:600;" id="modalCancelBtn2">Cancel</button>
@@ -225,6 +469,21 @@
             <button onclick="closeModal('historyModal')" class="btn-blue" style="background:var(--danger); width:100%; margin-top:15px; padding:10px;" id="modalCloseBtn">Close</button>
         </div>
     </div>
+
+    <!-- Confirm Action Modal -->
+    <div id="confirmModal" class="modal">
+        <div class="modal-box">
+            <h3 id="confirmModalTitle">Confirm Action</h3>
+            <p id="confirmModalMsg" style="font-size:13px; color:var(--text-body); margin: 10px 0 18px 0;"></p>
+            <div style="display:flex; gap:10px;">
+                <button id="confirmYesBtn" class="btn-blue" style="flex:1; background:var(--danger); padding:10px;">Yes</button>
+                <button onclick="closeModal('confirmModal')" class="btn-blue" style="flex:1; background:#64748b; padding:10px;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastBox"></div>
 
     <script>
         const firebaseConfig = {
@@ -242,7 +501,40 @@
 
         let isAdmin = false, globalData = [];
         let currentLang = "en"; 
-        let currentView = "cards"; 
+        // Default view is Table View ("table"), click Card View button to switch to Cards
+        let currentView = "table"; 
+        let pendingConfirmAction = null;
+
+        function showToast(msg) {
+            const toast = document.getElementById('toastBox');
+            toast.innerHTML = `🪔 ${msg}`;
+            toast.style.display = 'flex';
+            clearTimeout(window._toastTimer);
+            window._toastTimer = setTimeout(() => { toast.style.display = 'none'; }, 3200);
+        }
+
+        function openConfirmModal(msg, onConfirm) {
+            document.getElementById('confirmModalTitle').innerText = (currentLang === "hi") ? "पुष्टि करें" : "Confirm";
+            document.getElementById('confirmModalMsg').innerText = msg;
+            pendingConfirmAction = onConfirm;
+            const modal = document.getElementById('confirmModal');
+            modal.style.display = 'flex';
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        document.getElementById('confirmYesBtn').addEventListener('click', () => {
+            if (typeof pendingConfirmAction === 'function') pendingConfirmAction();
+            pendingConfirmAction = null;
+            closeModal('confirmModal');
+        });
+
+        function openDiwaliWish() {
+            const modal = document.getElementById('diwaliModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => modal.classList.add('active'), 10);
+            }
+        }
 
         db.ref('billingData').on('value', (snap) => {
             document.getElementById('dataLoader').style.display = 'none';
@@ -251,12 +543,22 @@
             updateNameSuggestions(globalData);
         });
 
+        function updateViewButtonLabel() {
+            const viewBtn = document.getElementById('viewBtn');
+            if (currentView === "table") {
+                viewBtn.innerHTML = (currentLang === "hi") ? "📇 कार्ड व्यू" : "📇 Card View";
+            } else {
+                viewBtn.innerHTML = (currentLang === "hi") ? "📋 टेबल व्यू" : "📋 Table View";
+            }
+        }
+
         function toggleView() {
             if (currentView === "cards") {
-                currentView = "table"; document.getElementById('viewBtn').innerHTML = "📇 Card View";
+                currentView = "table";
             } else {
-                currentView = "cards"; document.getElementById('viewBtn').innerHTML = "📋 Table View";
+                currentView = "cards";
             }
+            updateViewButtonLabel();
             displayData(globalData);
         }
 
@@ -276,10 +578,19 @@
             }
         }
 
+        function openAllHistory() {
+            const uniqueNames = [...new Set(globalData.map(i => i.name))];
+            if (uniqueNames.length > 0) {
+                showHistory(uniqueNames[0]);
+            } else {
+                showHistory("");
+            }
+        }
+
         function showHistory(name) {
-            document.getElementById('historyModalTitle').innerText = (currentLang === "hi" ? "हिस्ट्री: " : "History: ") + name;
+            document.getElementById('historyModalTitle').innerText = (currentLang === "hi" ? "हिस्ट्री: " : "History: ") + (name || "All");
             const hList = document.getElementById('historyList'); hList.innerHTML = '';
-            const userRecords = globalData.filter(i => i.name === name).sort((a,b) => b.id - a.id);
+            const userRecords = (name ? globalData.filter(i => i.name === name) : globalData).sort((a,b) => b.id - a.id);
             
             const labels = {
                 en: { rem: "Rem", adv: "Adv", settled: "Settled" },
@@ -341,18 +652,22 @@
             if(pass === "whistle2029") {
                 isAdmin = true; document.getElementById('adminPanel').style.display = 'block'; document.getElementById('logoutBtn').style.display = 'inline-block'; 
                 closeModal('loginModal'); document.getElementById('adminPass').value = ''; displayData(globalData); 
-            } else { alert((currentLang === "hi") ? "गलत पासवर्ड!" : "Incorrect Password!"); }
+                showToast((currentLang === "hi") ? "एडमिन पैनल अनलॉक हो गया!" : "Admin Panel Unlocked!");
+            } else { showToast((currentLang === "hi") ? "गलत पासवर्ड!" : "Incorrect Password!"); }
         }
 
         function logoutAdmin() {
             isAdmin = false; document.getElementById('adminPanel').style.display = 'none'; document.getElementById('logoutBtn').style.display = 'none';
-            displayData(globalData); alert((currentLang === "hi") ? "लॉगआउट हो गया।" : "Logged out.");
+            displayData(globalData); showToast((currentLang === "hi") ? "लॉगआउट हो गया।" : "Logged out.");
         }
 
         function setupYearMonth() {
             const select = document.getElementById('inputMonth'); select.innerHTML = '';
             const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
             [2026, 2027].forEach(y => months.forEach(m => { let opt = document.createElement('option'); opt.value = `${m} ${y}`; opt.innerHTML = `${m} ${y}`; select.appendChild(opt); }));
+            updateViewButtonLabel();
+            // Always show the Diwali wish pop-up every time the app is opened/loaded
+            openDiwaliWish();
         }
 
         function toggleLanguage() {
@@ -360,6 +675,7 @@
             if(currentLang === "hi") {
                 document.getElementById('langBtn').innerHTML = "🌐 English"; document.getElementById('titleText').innerText = "स्मार्ट बिलिंग";
                 document.getElementById('syncText').innerText = " क्लाउड सुरक्षित"; 
+                document.getElementById('wishBtn').innerHTML = "🪔 दिवाली शुभकामना";
                 document.getElementById('historyLinkBtn').innerHTML = "↺ इतिहास"; 
                 document.getElementById('logoutBtn').innerHTML = "🚪 लॉगआउट"; document.getElementById('loadingText').innerText = "डेटा लोड हो रहा है...";
                 document.getElementById('name').placeholder = "पूरा नाम दर्ज करें"; document.getElementById('oldR').placeholder = "पुरानी रीडिंग";
@@ -377,6 +693,7 @@
             } else {
                 document.getElementById('langBtn').innerHTML = "🌐 हिंदी"; document.getElementById('titleText').innerText = "Smart Billing";
                 document.getElementById('syncText').innerText = " Cloud Linked"; 
+                document.getElementById('wishBtn').innerHTML = "🪔 Diwali Wish";
                 document.getElementById('historyLinkBtn').innerHTML = "↺ History"; 
                 document.getElementById('logoutBtn').innerHTML = "🚪 Logout"; document.getElementById('loadingText').innerText = "Fetching Cloud Data...";
                 document.getElementById('name').placeholder = "Full Name"; document.getElementById('oldR').placeholder = "Old Reading";
@@ -392,6 +709,7 @@
                 document.getElementById('modalSyncBtn').innerText = "Sync Changes"; document.getElementById('modalCancelBtn1').innerText = "Cancel";
                 document.getElementById('modalCloseBtn').innerText = "Close";
             }
+            updateViewButtonLabel();
             displayData(globalData);
         }
 
@@ -404,8 +722,8 @@
             });
 
             const labels = {
-                en: { name: "Name", reading: "Readings", units: "Units", curBill: "Cur. Bill", prevBill: "Prev. Bill", total: "Total Bill", received: "Received", rem: "Rem", adv: "Adv", settled: "Settled", paid: "PAID", unpaid: "UNPAID", partial: "PARTIAL", edit: "Edit", del: "Del", action: "Action" },
-                hi: { name: "नाम", reading: "रीडिंग", units: "खपत", curBill: "वर्तमान बिल", prevBill: "पुराना बिल", total: "कुल बिल", received: "प्राप्त", rem: "बाकी", adv: "जमा", settled: "बराबर", paid: "चुक्ता", unpaid: "बाकी", partial: "आंशिक", edit: "बदलें", del: "हटाएं", action: "एक्शन" }
+                en: { name: "Name", reading: "Readings", units: "Units", curBill: "Cur. Bill", prevBill: "Prev. Bill", total: "Total Bill", received: "Received", status: "Status", rem: "Rem", adv: "Adv", settled: "Settled", paid: "PAID", unpaid: "UNPAID", partial: "PARTIAL", edit: "Edit", del: "Del", action: "Action" },
+                hi: { name: "नाम", reading: "रीडिंग", units: "खपत", curBill: "वर्तमान बिल", prevBill: "पुराना बिल", total: "कुल बिल", received: "प्राप्त", status: "स्थिति", rem: "बाकी", adv: "जमा", settled: "बराबर", paid: "चुक्ता", unpaid: "बाकी", partial: "आंशिक", edit: "बदलें", del: "हटाएं", action: "एक्शन" }
             }[currentLang];
 
             sortedMonths.forEach((month, index) => {
@@ -419,11 +737,11 @@
                 <div class="bill-container">
                     <div class="month-header" onclick="toggleMonth('${contentId}')">
                         <div class="month-header-left">
-                            <h2>${month}</h2>
+                            <h2>🪔 ${month}</h2>
                             <div class="month-date-sub">${blockDate}</div>
                         </div>
                         <div id="icon-${contentId}" class="toggle-icon" style="transform: ${iconRotate};">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </div>
                     </div>
                     <div class="month-content" id="${contentId}" style="display: ${displayState};">
@@ -528,7 +846,7 @@
             const opt = { margin: [10, 10, 10, 10], filename: 'Electricity_Bills.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true, backgroundColor: "#ffffff" }, jsPDF: { unit: 'mm', format: 'a4', orientation: currentView === 'cards' ? 'portrait' : 'landscape' } };
             html2pdf().set(opt).from(element).save().then(() => {
                 contents.forEach((content, idx) => { content.style.display = originalStates[idx]; if(icons[idx]) icons[idx].style.display = 'flex'; });
-                noPrintElements.forEach(el => { if(el.id === 'adminPanel' && isAdmin) el.style.display = 'block'; else if(el.className.includes('nav-container') || el.className.includes('c-actions') || el.className.includes('header-main')) el.style.display = 'flex'; else el.style.display = 'block'; });
+                noPrintElements.forEach(el => { if(el.id === 'adminPanel' && isAdmin) el.style.display = 'block'; else if(el.className.includes('nav-container') || el.className.includes('c-actions') || el.className.includes('header-main') || el.className.includes('diwali-toran')) el.style.display = 'flex'; else el.style.display = 'block'; });
                 document.body.style.backgroundColor = originalBg;
             });
         }
@@ -540,8 +858,11 @@
                 try {
                     const data = JSON.parse(e.target.result);
                     const msg = (currentLang === "hi") ? `क्या आप ${data.length} रिकॉर्ड रिस्टोर करना चाहते हैं?` : `Restore ${data.length} records?`;
-                    if (confirm(msg)) { data.forEach(item => db.ref('billingData/' + item.id).set(item)); alert((currentLang === "hi") ? "डाटा रिस्टोर हो गया!" : "Done!"); }
-                } catch (err) { alert((currentLang === "hi") ? "फॉर्मेट गलत है!" : "Format Error!"); }
+                    openConfirmModal(msg, () => {
+                        data.forEach(item => db.ref('billingData/' + item.id).set(item));
+                        showToast((currentLang === "hi") ? "डाटा रिस्टोर हो गया!" : "Data Restored!");
+                    });
+                } catch (err) { showToast((currentLang === "hi") ? "फॉर्मेट गलत है!" : "Format Error!"); }
             };
             reader.readAsText(file);
         }
@@ -556,9 +877,10 @@
                 id: Date.now(), month: document.getElementById('inputMonth').value, date: document.getElementById('inputDate').value, name: document.getElementById('name').value, 
                 oldR: parseInt(document.getElementById('oldR').value) || 0, newR: parseInt(document.getElementById('newR').value) || 0, bal: parseInt(document.getElementById('balanceCarry').value) || 0, paid: 0, status: "NOT PAID", rate: 11 
             };
-            if(!entry.name) return alert((currentLang === "hi") ? "नाम डालना अनिवार्य है!" : "Name required!");
+            if(!entry.name) return showToast((currentLang === "hi") ? "नाम डालना अनिवार्य है!" : "Name required!");
             db.ref('billingData/' + entry.id).set(entry);
             document.getElementById('name').value = ''; document.getElementById('newR').value = ''; document.getElementById('balanceCarry').value = '';
+            showToast((currentLang === "hi") ? "नई एंट्री जोड़ी गई!" : "Entry Added!");
         }
 
         function openEdit(id) {
@@ -622,12 +944,15 @@
                 }
                 if (record.id == id) { startUpdatingNext = true; }
             }
-            db.ref().update(updates).then(() => { closeModal('editModal'); }).catch(error => { alert("Update failed: " + error); });
+            db.ref().update(updates).then(() => { closeModal('editModal'); showToast((currentLang === "hi") ? "अपडेट हो गया!" : "Record Updated!"); }).catch(error => { showToast("Update failed: " + error); });
         }
 
         function deleteRow(id) { 
             const msg = (currentLang === "hi") ? "क्या आप इस रिकॉर्ड को हटाना चाहते हैं?" : "Delete record?";
-            if(confirm(msg)) db.ref('billingData/' + id).remove(); 
+            openConfirmModal(msg, () => {
+                db.ref('billingData/' + id).remove();
+                showToast((currentLang === "hi") ? "रिकॉर्ड हटा दिया गया।" : "Record deleted.");
+            });
         }
         
         function closeModal(id) { const modal = document.getElementById(id); modal.classList.remove('active'); setTimeout(() => modal.style.display = 'none', 300); }
@@ -635,6 +960,8 @@
             const records = globalData.filter(i => i.name === val).sort((a,b) => b.id - a.id);
             if(records.length > 0) { document.getElementById('oldR').value = records[0].newR; let lastRate = records[0].rate || 10; document.getElementById('balanceCarry').value = ((records[0].newR - records[0].oldR) * lastRate) + records[0].bal - records[0].paid; }
         }
+
+
         function updateNameSuggestions(data) {
             const list = document.getElementById('nameList'); list.innerHTML = '';
             [...new Set(data.map(i => i.name))].forEach(n => { let o = document.createElement('option'); o.value = n; list.appendChild(o); });
