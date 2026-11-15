@@ -23,7 +23,9 @@ jobs:
         run: |
           unzip -q LUX26_Android_APK_Phone_Build.zip -d /tmp/lux26
           cp -R /tmp/lux26/LUX26_Android_APK ./android
-
+      - name: Set app display name
+        run: |
+          sed -i 's/android:label="LUX 26"/android:label="eBill"/' android/app/src/main/AndroidManifest.xml
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
