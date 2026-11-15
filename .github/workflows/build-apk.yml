@@ -36,7 +36,7 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '9.3.1'
+          gradle-version: '9.6.0'
 
       - name: Build APK
         run: gradle --no-daemon -p android :app:assembleDebug
