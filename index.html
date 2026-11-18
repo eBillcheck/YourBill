@@ -2364,14 +2364,42 @@
         @media (max-width: 480px) {
             .lux-auth-box { width: calc(100% - 24px) !important; }
         }
-    </style>
+    
+        /* eBill brand logo — replaces the old SMART BILLING heading */
+        #brandHeader #titleText {
+            position: absolute !important;
+            left: 30px !important;
+            right: 90px !important;
+            bottom: 13px !important;
+            display: block !important;
+            width: min(280px, calc(100% - 130px)) !important;
+            height: 68px !important;
+            max-width: none !important;
+            object-fit: contain !important;
+            object-position: left center !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 0 !important;
+            letter-spacing: 0 !important;
+            text-transform: none !important;
+        }
+        @media (max-width: 600px) {
+            #brandHeader #titleText {
+                left: 19px !important;
+                right: 66px !important;
+                bottom: 12px !important;
+                width: min(235px, calc(100% - 100px)) !important;
+                height: 58px !important;
+            }
+        }
+</style>
 
 </head>
 <body onload="setupYearMonth()">
 
     <h1 class="header-main no-print" id="brandHeader">
         <span class="brand-eyebrow">ELECTRICITY MANAGEMENT</span>
-        <span id="titleText">SMART BILLING</span>
+        <img id="titleText" src="eBill.png" alt="eBill logo">
         <button class="menu-trigger" id="menuTrigger" type="button" onclick="toggleSideMenu()" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
     </h1>
 
@@ -3224,7 +3252,7 @@
         function toggleLanguage() {
             currentLang = (currentLang === "en") ? "hi" : "en";
             if(currentLang === "hi") {
-                document.getElementById('langBtn').innerHTML = "🌐 English"; document.getElementById('titleText').innerText = "स्मार्ट बिलिंग";
+                document.getElementById('langBtn').innerHTML = "🌐 English"; 
                  
                 document.getElementById('logoutBtn').innerHTML = "🚪 लॉगआउट"; document.getElementById('loadingText').innerText = "डेटा लोड हो रहा है...";
                 document.getElementById('name').placeholder = "पूरा नाम दर्ज करें"; document.getElementById('oldR').placeholder = "पुरानी रीडिंग";
@@ -3240,7 +3268,7 @@
                 document.getElementById('modalSyncBtn').innerText = "सिंक करें"; document.getElementById('modalCancelBtn1').innerText = "रद्द करें";
                 document.getElementById('modalCloseBtn').innerText = "बंद करें";
             } else {
-                document.getElementById('langBtn').innerHTML = "🌐 हिंदी"; document.getElementById('titleText').innerText = "Smart Billing";
+                document.getElementById('langBtn').innerHTML = "🌐 हिंदी"; 
                  
                 document.getElementById('logoutBtn').innerHTML = "🚪 Logout"; document.getElementById('loadingText').innerText = "Fetching Cloud Data...";
                 document.getElementById('name').placeholder = "Full Name"; document.getElementById('oldR').placeholder = "Old Reading";
